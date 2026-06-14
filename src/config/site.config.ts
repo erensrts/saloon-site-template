@@ -19,7 +19,7 @@ import t3 from "@/assets/team/t3.jpg";
  */
 export const siteConfig = {
   businessName: "Lumière",
-  businessNameSuffix: "Beauty MakeUp Studio",
+  businessNameSuffix: "Beauty Studio",
   tagline: "Güzelliğinizi aydınlatıyoruz",
   heroSubtitle:
     "İstanbul’un kalbinde, sıcak ve davetkâr atmosferimizde sizi en iyi haline kavuşturuyoruz.",
