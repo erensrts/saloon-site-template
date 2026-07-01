@@ -1,20 +1,97 @@
 import { useState } from "react";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { siteConfig } from "@/config/site.config";
+
+const bookingSchema = z.object({
+  name: z.string().trim().min(2, "Ad soyad en az 2 karakter olmalı").max(100),
+  phone: z
+    .string()
+    .trim()
+    .min(7, "Geçerli bir telefon girin")
+    .max(25)
+    .regex(/^[+\d\s()-]+$/, "Geçerli bir telefon girin"),
+  email: z
+    .string()
+    .trim()
+    .max(255)
+    .email("Geçerli bir e-posta girin")
+    .optional()
+    .or(z.literal("")),
+  service: z.string().min(1, "Bir hizmet seçin"),
+  date: z.string().min(1, "Tarih seçin"),
+  time: z.string().min(1, "Saat seçin"),
+  note: z.string().max(500).optional().or(z.literal("")),
+});
+
+function formatDateTR(iso: string): string {
+  // iso: "YYYY-MM-DD"
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return iso;
+  const date = new Date(y, m - 1, d);
+  try {
+    return new Intl.DateTimeFormat("tr-TR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(date);
+  } catch {
+    return iso;
+  }
+}
+
+function formatTimeTR(hhmm: string): string {
+  // Native time input already gives "HH:mm"
+  return hhmm;
+}
 
 export function Booking() {
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const formEl = e.currentTarget;
+    const fd = new FormData(formEl);
+
+    const raw = {
+      name: String(fd.get("name") ?? ""),
+      phone: String(fd.get("phone") ?? ""),
+      email: String(fd.get("email") ?? ""),
+      service: String(fd.get("service") ?? ""),
+      date: String(fd.get("date") ?? ""),
+      time: String(fd.get("time") ?? ""),
+      note: String(fd.get("note") ?? ""),
+    };
+
+    const parsed = bookingSchema.safeParse(raw);
+    if (!parsed.success) {
+      const first = parsed.error.issues[0]?.message ?? "Lütfen formu kontrol edin";
+      toast.error(first);
+      return;
+    }
+
     setSubmitting(true);
-    // Şablon: gerçek bir backend bağlanana kadar simüle ediyoruz.
-    setTimeout(() => {
-      setSubmitting(false);
-      (e.target as HTMLFormElement).reset();
-      toast.success("Randevu talebiniz alındı! En kısa sürede sizi arayacağız.");
-    }, 700);
+    const v = parsed.data;
+
+    const lines = [
+      "Merhaba, randevu talebim var:",
+      "",
+      `Ad Soyad: ${v.name}`,
+      `Telefon: ${v.phone}`,
+      ...(v.email ? [`E-posta: ${v.email}`] : []),
+      `Hizmet: ${v.service}`,
+      `Tarih: ${formatDateTR(v.date)}`,
+      `Saat: ${formatTimeTR(v.time)}`,
+      ...(v.note ? [`Not: ${v.note}`] : []),
+    ];
+    const message = lines.join("\n");
+    const url = `https://wa.me/${siteConfig.contact.whatsapp}?text=${encodeURIComponent(message)}`;
+
+    window.open(url, "_blank", "noopener,noreferrer");
+    toast.success("Randevu talebiniz WhatsApp üzerinden iletiliyor…");
+    formEl.reset();
+    setSubmitting(false);
   };
 
   return (
@@ -62,6 +139,7 @@ export function Booking() {
               <textarea
                 name="note"
                 rows={3}
+                maxLength={500}
                 className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </div>
@@ -71,7 +149,7 @@ export function Booking() {
               disabled={submitting}
               className="w-full rounded-full bg-primary py-3.5 font-medium text-primary-foreground hover:bg-primary/90 transition disabled:opacity-60"
             >
-              {submitting ? "Gönderiliyor…" : "Randevu Talep Et"}
+              {submitting ? "Yönlendiriliyor…" : "WhatsApp ile Randevu Talep Et"}
             </button>
           </form>
 
