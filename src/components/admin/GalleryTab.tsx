@@ -312,6 +312,10 @@ function GalleryEditor({
             if (canSave) onSubmit(form);
           }}
         >
+          <UploadField
+            value={form.url}
+            onUploaded={(url) => patch({ url })}
+          />
           <div className="grid gap-2">
             <Label htmlFor="gal-url">{tt.fields.url}</Label>
             <Input
@@ -319,7 +323,7 @@ function GalleryEditor({
               type="url"
               value={form.url}
               onChange={(e) => patch({ url: e.target.value })}
-              placeholder="https://…/photo.jpg"
+              placeholder="https://…/photo.webp"
               required
             />
             <p className="text-xs text-muted-foreground">{tt.fields.urlHint}</p>
