@@ -1,13 +1,14 @@
 import { siteConfig } from "@/config/site.config";
+import { t } from "@/i18n";
 
 export function Gallery() {
   return (
     <section id="gallery" className="section-padding">
       <div className="container-narrow">
         <div className="max-w-2xl mb-12 md:mb-16">
-          <p className="text-primary text-sm uppercase tracking-[0.2em] mb-3">Galeri</p>
+          <p className="text-primary text-sm uppercase tracking-[0.2em] mb-3">{t.gallery.eyebrow}</p>
           <h2 className="text-4xl md:text-5xl font-medium leading-tight">
-            Çalışmalarımızdan kareler
+            {t.gallery.heading}
           </h2>
         </div>
 
