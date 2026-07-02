@@ -81,9 +81,7 @@ function AdminPage() {
     );
   }
 
-  const placeholderTabs: { value: string; label: string }[] = [
-    { value: "content", label: ta.tabs.content },
-  ];
+  const placeholderTabs: { value: string; label: string }[] = [];
 
 
 
