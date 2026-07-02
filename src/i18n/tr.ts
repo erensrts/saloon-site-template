@@ -134,8 +134,25 @@ export const tr = {
       toastDeleted: "Hizmet silindi",
       toastToggled: "Durum güncellendi",
     },
+    hours: {
+      title: "Çalışma Saatleri",
+      subtitle:
+        "İletişim bölümünde ve alt bilgide gösterilen gün/saat satırları.",
+      addNew: "Yeni Satır",
+      editTitle: "Saati Düzenle",
+      newTitle: "Yeni Çalışma Saati",
+      fields: {
+        day: "Gün / Aralık",
+        time: "Saat",
+        sortOrder: "Sıra",
+      },
+      toastCreated: "Satır eklendi",
+      toastUpdated: "Satır güncellendi",
+      toastDeleted: "Satır silindi",
+    },
   },
 };
+
 
 export type Dictionary = typeof tr;
 
