@@ -25,16 +25,21 @@ const listSchema = z
   .object({ language: z.string().min(2).max(5).default("tr") })
   .default({ language: "tr" });
 
-async function assertAdmin(context: {
-  supabase: { rpc: (fn: string, args: unknown) => Promise<{ data: unknown }> };
+type AuthCtx = {
+  supabase: {
+    rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" | "editor" }) => Promise<{ data: boolean | null }>;
+  };
   userId: string;
-}) {
+};
+
+async function assertAdmin(context: AuthCtx) {
   const { data: isAdmin } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",
   });
   if (!isAdmin) throw new Error("Forbidden");
 }
+
 
 export const adminListWorkingHours = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
