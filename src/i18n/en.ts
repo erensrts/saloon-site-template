@@ -151,7 +151,38 @@ export const en: Dictionary = {
       toastUpdated: "Row updated",
       toastDeleted: "Row removed",
     },
+    slots: {
+      title: "Availability Slots",
+      subtitle:
+        "Date/time combinations offered to customers in the booking form. Bulk-generate a range below.",
+      generator: {
+        title: "Bulk generator",
+        from: "Start date",
+        to: "End date",
+        weekdays: "Days",
+        times: "Times",
+        timesHint: "Comma separated (e.g. 10:00, 11:30, 14:00)",
+        submit: "Generate",
+        submitting: "Generating…",
+      },
+      list: {
+        title: "Existing slots",
+        rangeFrom: "From",
+        rangeTo: "To",
+        refresh: "Refresh",
+        deleteRange: "Delete free in range",
+        booked: "Booked",
+        free: "Free",
+      },
+      toastGenerated: (inserted: number, skipped: number) =>
+        `${inserted} slots added, ${skipped} skipped`,
+      toastDeleted: "Slot deleted",
+      toastRangeDeleted: (n: number) => `${n} free slots deleted`,
+      confirmDeleteRange: "Delete all free slots in the selected range?",
+      weekdayShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    },
   },
 };
+
 
 
