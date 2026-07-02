@@ -150,8 +150,39 @@ export const tr = {
       toastUpdated: "Satır güncellendi",
       toastDeleted: "Satır silindi",
     },
+    slots: {
+      title: "Boş Zaman Dilimleri",
+      subtitle:
+        "Randevu formunda müşterilere sunulan tarih/saat kombinasyonları. Aşağıdan bir aralık için toplu üretim yapabilirsiniz.",
+      generator: {
+        title: "Toplu Üretici",
+        from: "Başlangıç tarihi",
+        to: "Bitiş tarihi",
+        weekdays: "Günler",
+        times: "Saatler",
+        timesHint: "Virgülle ayırın (örn: 10:00, 11:30, 14:00)",
+        submit: "Üret",
+        submitting: "Üretiliyor…",
+      },
+      list: {
+        title: "Mevcut Slotlar",
+        rangeFrom: "Başlangıç",
+        rangeTo: "Bitiş",
+        refresh: "Yenile",
+        deleteRange: "Aralıktaki Boşları Sil",
+        booked: "Rezerve",
+        free: "Boş",
+      },
+      toastGenerated: (inserted: number, skipped: number) =>
+        `${inserted} slot eklendi, ${skipped} atlandı`,
+      toastDeleted: "Slot silindi",
+      toastRangeDeleted: (n: number) => `${n} boş slot silindi`,
+      confirmDeleteRange: "Seçili aralıktaki tüm boş slotlar silinsin mi?",
+      weekdayShort: ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"],
+    },
   },
 };
+
 
 
 export type Dictionary = typeof tr;
