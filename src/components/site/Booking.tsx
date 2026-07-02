@@ -228,9 +228,50 @@ export function Booking() {
               </select>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
-              <Field label={f.date} name="date" type="date" required />
-              <Field label={f.time} name="time" type="time" required />
+              <div>
+                <label className="block text-sm font-medium mb-1.5">{f.date}</label>
+                <input
+                  type="date"
+                  required
+                  min={minDate}
+                  max={maxDate}
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1.5 flex items-center gap-1.5">
+                  {f.time}
+                  {slotsLoading && (
+                    <Loader2 size={14} className="animate-spin text-muted-foreground" />
+                  )}
+                </label>
+                <select
+                  required
+                  value={selectedSlotId}
+                  onChange={(e) => setSelectedSlotId(e.target.value)}
+                  disabled={!selectedDate || slotsLoading || timeOptions.length === 0}
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+                >
+                  <option value="">
+                    {!selectedDate
+                      ? f.timePlaceholder
+                      : slotsLoading
+                        ? f.loadingSlots
+                        : timeOptions.length === 0
+                          ? f.timePlaceholderEmpty
+                          : f.timePlaceholderChoose}
+                  </option>
+                  {timeOptions.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
+
             <div>
               <label className="block text-sm font-medium mb-1.5">{f.note}</label>
               <textarea
