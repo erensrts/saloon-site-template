@@ -74,9 +74,9 @@ export const getPublicSiteData = createServerFn({ method: "GET" }).handler(
           .eq("language", language),
       ]);
 
-      const content: Record<string, unknown> = {};
+      const content: Record<string, JsonValue> = {};
       for (const row of contentRes.data ?? []) {
-        content[row.key as string] = row.value;
+        content[row.key as string] = row.value as JsonValue;
       }
 
       return {
