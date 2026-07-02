@@ -202,6 +202,29 @@ export const en: Dictionary = {
       toastDeleted: "Image removed",
       toastToggled: "Status updated",
     },
+    appointments: {
+      title: "Appointments",
+      subtitle:
+        "Customer requests. Update the status or cancel — deleting an appointment frees its slot.",
+      refresh: "Refresh",
+      searchLabel: "Search",
+      searchPlaceholder: "Name, phone or email…",
+      columns: {
+        when: "Date & time",
+        customer: "Customer",
+        service: "Service",
+        status: "Status",
+      },
+      status: {
+        all: "All",
+        pending: "Pending",
+        confirmed: "Confirmed",
+        completed: "Completed",
+        cancelled: "Cancelled",
+      },
+      toastStatusUpdated: "Status updated",
+      toastDeleted: "Appointment deleted",
+    },
   },
 };
 
