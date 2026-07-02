@@ -211,6 +211,9 @@ export const en: Dictionary = {
       toastUploadFailed: "Upload failed",
       toastUnsupportedFile: "Only image files can be uploaded",
       toastFileTooLarge: "File too large (max 15 MB)",
+      toastDeleted: "Image removed",
+      toastToggled: "Status updated",
+    },
     appointments: {
       title: "Appointments",
       subtitle:
