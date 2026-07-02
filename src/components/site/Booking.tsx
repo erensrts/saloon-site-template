@@ -43,6 +43,7 @@ function formatDateLocalized(iso: string): string {
 }
 
 export function Booking() {
+  const site = useSiteData();
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
