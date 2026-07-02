@@ -1,15 +1,16 @@
-import { siteConfig } from "@/config/site.config";
 import { t } from "@/i18n";
+import { useSiteData } from "./SiteDataProvider";
 
 export function Hero() {
-  const fullName = `${siteConfig.businessName} ${siteConfig.businessNameSuffix}`.trim();
+  const site = useSiteData();
+  const fullName = `${site.businessName} ${site.businessNameSuffix}`.trim();
   const isLongName = fullName.length > 25;
 
   return (
     <section id="top" className="relative isolate min-h-[92vh] flex items-center overflow-hidden">
       <img
-        src={siteConfig.heroImage}
-        alt={siteConfig.businessName}
+        src={site.heroImage}
+        alt={site.businessName}
         width={1920}
         height={1080}
         className="absolute inset-0 -z-10 h-full w-full object-cover"
@@ -19,7 +20,7 @@ export function Hero() {
       <div className="container-narrow py-16 md:py-24 lg:py-28">
         <div className="max-w-3xl fade-up">
           <p className="font-display italic text-primary text-lg md:text-xl mb-4">
-            {siteConfig.tagline}
+            {site.tagline}
           </p>
           <h1
             className="font-display font-medium text-foreground"
@@ -31,11 +32,11 @@ export function Hero() {
               letterSpacing: "-0.02em",
             }}
           >
-            {siteConfig.businessName}{" "}
-            <span className="text-primary">{siteConfig.businessNameSuffix}</span>
+            {site.businessName}{" "}
+            <span className="text-primary">{site.businessNameSuffix}</span>
           </h1>
           <p className="mt-6 max-w-xl text-base md:text-lg text-foreground/75">
-            {siteConfig.heroSubtitle}
+            {site.heroSubtitle}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a

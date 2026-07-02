@@ -9,6 +9,7 @@ import { Testimonials } from "@/components/site/Testimonials";
 import { Booking } from "@/components/site/Booking";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
+import { SiteDataProvider } from "@/components/site/SiteDataProvider";
 import { siteConfig } from "@/config/site.config";
 
 export const Route = createFileRoute("/")({
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <>
+    <SiteDataProvider>
       <Navbar />
       <main>
         <Hero />
@@ -41,6 +42,6 @@ function Index() {
       <Footer />
       <WhatsAppButton />
       <Toaster position="top-center" richColors />
-    </>
+    </SiteDataProvider>
   );
 }
