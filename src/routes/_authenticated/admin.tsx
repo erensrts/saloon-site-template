@@ -12,6 +12,7 @@ import { WorkingHoursTab } from "@/components/admin/WorkingHoursTab";
 import { SlotsTab } from "@/components/admin/SlotsTab";
 import { GalleryTab } from "@/components/admin/GalleryTab";
 import { AppointmentsTab } from "@/components/admin/AppointmentsTab";
+import { ContentTab } from "@/components/admin/ContentTab";
 
 
 
