@@ -136,6 +136,22 @@ export const en: Dictionary = {
       toastDeleted: "Service deleted",
       toastToggled: "Status updated",
     },
+    hours: {
+      title: "Working Hours",
+      subtitle: "Day/time rows shown in the contact section and footer.",
+      addNew: "New row",
+      editTitle: "Edit row",
+      newTitle: "Add working hour",
+      fields: {
+        day: "Day / Range",
+        time: "Time",
+        sortOrder: "Order",
+      },
+      toastCreated: "Row added",
+      toastUpdated: "Row updated",
+      toastDeleted: "Row removed",
+    },
   },
 };
+
 

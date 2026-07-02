@@ -8,6 +8,8 @@ import { getMyRole } from "@/lib/auth.functions";
 import { Toaster } from "@/components/ui/sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ServicesTab } from "@/components/admin/ServicesTab";
+import { WorkingHoursTab } from "@/components/admin/WorkingHoursTab";
+
 import { t } from "@/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -75,11 +77,11 @@ function AdminPage() {
 
   const placeholderTabs: { value: string; label: string }[] = [
     { value: "appointments", label: ta.tabs.appointments },
-    { value: "hours", label: ta.tabs.hours },
     { value: "slots", label: ta.tabs.slots },
     { value: "gallery", label: ta.tabs.gallery },
     { value: "content", label: ta.tabs.content },
   ];
+
 
   return (
     <div className="min-h-screen bg-secondary/40">
@@ -111,6 +113,9 @@ function AdminPage() {
             <TabsTrigger value="services" className="rounded-xl">
               {ta.tabs.services}
             </TabsTrigger>
+            <TabsTrigger value="hours" className="rounded-xl">
+              {ta.tabs.hours}
+            </TabsTrigger>
             {placeholderTabs.map((tab) => (
               <TabsTrigger key={tab.value} value={tab.value} className="rounded-xl">
                 {tab.label}
@@ -121,6 +126,11 @@ function AdminPage() {
           <TabsContent value="services" className="mt-0">
             <ServicesTab />
           </TabsContent>
+
+          <TabsContent value="hours" className="mt-0">
+            <WorkingHoursTab />
+          </TabsContent>
+
 
           {placeholderTabs.map((tab) => (
             <TabsContent key={tab.value} value={tab.value} className="mt-0">
