@@ -224,6 +224,31 @@ export const tr = {
       toastStatusUpdated: "Durum güncellendi",
       toastDeleted: "Randevu silindi",
     },
+    content: {
+      title: "Site İçeriği",
+      subtitle:
+        "Ana sayfadaki bölümlerin metin içerikleri. Her anahtar bir JSON nesnesidir; düzenledikten sonra Kaydet'e basın.",
+      addNew: "Yeni Anahtar",
+      newKeyPlaceholder: "örn: promo",
+      newValuePlaceholder: '{\n  "title": "..."\n}',
+      keyLabel: "Anahtar",
+      valueLabel: "Değer (JSON)",
+      shapeHint: "Beklenen alanlar",
+      invalidJson: "Geçersiz JSON",
+      reset: "Değişiklikleri geri al",
+      knownKeys: {
+        hero: "Kahraman bölüm (başlık, alt başlık, CTA)",
+        about: "Hakkımızda (başlık, alt başlık, paragraflar)",
+        team: "Ekip üyeleri listesi",
+        testimonials: "Müşteri yorumları listesi",
+        contact: "İletişim bilgileri (telefon, adres, harita…)",
+        social: "Sosyal medya linkleri",
+      },
+      toastSaved: "İçerik kaydedildi",
+      toastDeleted: "Anahtar silindi",
+      confirmDelete:
+        "Bu içerik anahtarını silmek istediğinize emin misiniz? Site fallback değerlerine dönecek.",
+    },
   },
 };
 

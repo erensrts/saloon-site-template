@@ -225,6 +225,31 @@ export const en: Dictionary = {
       toastStatusUpdated: "Status updated",
       toastDeleted: "Appointment deleted",
     },
+    content: {
+      title: "Site Content",
+      subtitle:
+        "Text blocks shown across the homepage. Each key is a JSON object — edit and press Save.",
+      addNew: "New Key",
+      newKeyPlaceholder: "e.g. promo",
+      newValuePlaceholder: '{\n  "title": "..."\n}',
+      keyLabel: "Key",
+      valueLabel: "Value (JSON)",
+      shapeHint: "Expected fields",
+      invalidJson: "Invalid JSON",
+      reset: "Discard changes",
+      knownKeys: {
+        hero: "Hero section (title, subtitle, CTA)",
+        about: "About (title, subtitle, paragraphs)",
+        team: "Team members list",
+        testimonials: "Client testimonials list",
+        contact: "Contact info (phone, address, map…)",
+        social: "Social links",
+      },
+      toastSaved: "Content saved",
+      toastDeleted: "Key deleted",
+      confirmDelete:
+        "Delete this content key? The site will fall back to bundled defaults.",
+    },
   },
 };
 

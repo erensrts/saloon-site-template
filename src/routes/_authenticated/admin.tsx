@@ -12,6 +12,7 @@ import { WorkingHoursTab } from "@/components/admin/WorkingHoursTab";
 import { SlotsTab } from "@/components/admin/SlotsTab";
 import { GalleryTab } from "@/components/admin/GalleryTab";
 import { AppointmentsTab } from "@/components/admin/AppointmentsTab";
+import { ContentTab } from "@/components/admin/ContentTab";
 
 
 
@@ -80,9 +81,7 @@ function AdminPage() {
     );
   }
 
-  const placeholderTabs: { value: string; label: string }[] = [
-    { value: "content", label: ta.tabs.content },
-  ];
+  const placeholderTabs: { value: string; label: string }[] = [];
 
 
 
@@ -129,7 +128,9 @@ function AdminPage() {
             <TabsTrigger value="gallery" className="rounded-xl">
               {ta.tabs.gallery}
             </TabsTrigger>
-
+            <TabsTrigger value="content" className="rounded-xl">
+              {ta.tabs.content}
+            </TabsTrigger>
 
             {placeholderTabs.map((tab) => (
               <TabsTrigger key={tab.value} value={tab.value} className="rounded-xl">
@@ -158,6 +159,10 @@ function AdminPage() {
 
           <TabsContent value="gallery" className="mt-0">
             <GalleryTab />
+          </TabsContent>
+
+          <TabsContent value="content" className="mt-0">
+            <ContentTab />
           </TabsContent>
 
 
