@@ -22,7 +22,7 @@ export function Gallery() {
             >
               <img
                 src={src}
-                alt={`Galeri görseli ${i + 1}`}
+                alt={t.gallery.imageAlt(i + 1)}
                 loading="lazy"
                 width={800}
                 height={800}

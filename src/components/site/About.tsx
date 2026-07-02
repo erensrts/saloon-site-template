@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config/site.config";
+import { t } from "@/i18n";
 
 export function About() {
   return (
@@ -22,7 +23,7 @@ export function About() {
             <div className="aspect-[4/5] overflow-hidden rounded-3xl">
               <img
                 src={siteConfig.about.image}
-                alt="Salon iç mekân"
+                alt={t.about.imageAlt}
                 loading="lazy"
                 width={1200}
                 height={1200}
@@ -36,7 +37,7 @@ export function About() {
 
         {/* Team */}
         <div className="mt-20 md:mt-28">
-          <h3 className="font-display text-3xl md:text-4xl mb-10 text-center">Tanışın, Ekibimiz</h3>
+          <h3 className="font-display text-3xl md:text-4xl mb-10 text-center">{t.about.teamHeading}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {siteConfig.team.map((m) => (
               <div key={m.name} className="text-center group">
