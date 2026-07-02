@@ -19,12 +19,11 @@ import t3 from "@/assets/team/t3.jpg";
  */
 export const siteConfig = {
   /** Aktif dil — tüm UI stringleri bu locale'den okunur. */
-  locale: "tr" as "tr" | "en",
+  locale: "en" as "tr" | "en",
   businessName: "Lumière",
   businessNameSuffix: "Beauty Studio",
   tagline: "Güzelliğinizi aydınlatıyoruz",
-  heroSubtitle:
-    "İstanbul’un kalbinde, sıcak ve davetkâr atmosferimizde sizi en iyi haline kavuşturuyoruz.",
+  heroSubtitle: "İstanbul’un kalbinde, sıcak ve davetkâr atmosferimizde sizi en iyi haline kavuşturuyoruz.",
   heroCta: "Randevu Al",
   heroImage: heroImg,
 
