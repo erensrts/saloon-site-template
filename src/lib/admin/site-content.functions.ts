@@ -2,11 +2,19 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [k: string]: JsonValue };
+
 export type SiteContentRow = {
   id: string;
   language: string;
   key: string;
-  value: unknown;
+  value: JsonValue;
   created_at: string;
   updated_at: string;
 };
