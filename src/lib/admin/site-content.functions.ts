@@ -46,7 +46,14 @@ const upsertSchema = z.object({
     .min(1)
     .max(64)
     .regex(/^[a-z][a-z0-9_]*$/, "sadece küçük harf, rakam, alt çizgi"),
-  value: z.unknown(),
+  value: z.custom<JsonValue>((v) => {
+    try {
+      JSON.stringify(v);
+      return true;
+    } catch {
+      return false;
+    }
+  }),
 });
 
 const deleteSchema = z.object({
