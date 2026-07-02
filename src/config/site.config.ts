@@ -120,8 +120,8 @@ export const siteConfig = {
   ],
 
   contact: {
-    phone: "+90 555 123 45 67",
-    whatsapp: "905551234567",
+    phone: "+90 541 357 75 35",
+    whatsapp: "905413577535",
     whatsappMessage: "Merhaba, randevu almak istiyorum.",
     whatsappLabel: "Bize Yazın",
     email: "info@lumiere-studio.com",
