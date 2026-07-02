@@ -2,8 +2,8 @@ import { useState } from "react";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { siteConfig } from "@/config/site.config";
 import { t, intlLocale } from "@/i18n";
+import { useSiteData } from "./SiteDataProvider";
 
 const v = t.booking.validation;
 const bookingSchema = z.object({
