@@ -11,6 +11,7 @@ import { ServicesTab } from "@/components/admin/ServicesTab";
 import { WorkingHoursTab } from "@/components/admin/WorkingHoursTab";
 import { SlotsTab } from "@/components/admin/SlotsTab";
 import { GalleryTab } from "@/components/admin/GalleryTab";
+import { AppointmentsTab } from "@/components/admin/AppointmentsTab";
 
 
 
@@ -80,7 +81,6 @@ function AdminPage() {
   }
 
   const placeholderTabs: { value: string; label: string }[] = [
-    { value: "appointments", label: ta.tabs.appointments },
     { value: "content", label: ta.tabs.content },
   ];
 
@@ -112,8 +112,11 @@ function AdminPage() {
       </header>
 
       <main className="container-narrow py-8 md:py-10">
-        <Tabs defaultValue="services" className="w-full">
+        <Tabs defaultValue="appointments" className="w-full">
           <TabsList className="w-full flex-wrap h-auto justify-start gap-1 bg-card border border-border/60 p-1 rounded-2xl mb-6">
+            <TabsTrigger value="appointments" className="rounded-xl">
+              {ta.tabs.appointments}
+            </TabsTrigger>
             <TabsTrigger value="services" className="rounded-xl">
               {ta.tabs.services}
             </TabsTrigger>
@@ -126,6 +129,7 @@ function AdminPage() {
             <TabsTrigger value="gallery" className="rounded-xl">
               {ta.tabs.gallery}
             </TabsTrigger>
+
 
             {placeholderTabs.map((tab) => (
               <TabsTrigger key={tab.value} value={tab.value} className="rounded-xl">
