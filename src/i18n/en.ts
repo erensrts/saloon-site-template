@@ -181,8 +181,30 @@ export const en: Dictionary = {
       confirmDeleteRange: "Delete all free slots in the selected range?",
       weekdayShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     },
+    gallery: {
+      title: "Gallery",
+      subtitle:
+        "Gallery cards shown on the homepage. Paste image URLs — lower order numbers appear first.",
+      addNew: "New image",
+      editTitle: "Edit image",
+      newTitle: "Add image",
+      fields: {
+        url: "Image URL",
+        urlHint: "Must be a direct .jpg / .png / .webp link",
+        alt: "Alt text (SEO)",
+        sortOrder: "Order",
+        isActive: "Active (show on site)",
+      },
+      preview: "Preview",
+      previewFailed: "Failed to load image",
+      toastCreated: "Image added",
+      toastUpdated: "Image updated",
+      toastDeleted: "Image removed",
+      toastToggled: "Status updated",
+    },
   },
 };
+
 
 
 

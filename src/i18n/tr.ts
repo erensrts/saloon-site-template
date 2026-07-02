@@ -180,8 +180,30 @@ export const tr = {
       confirmDeleteRange: "Seçili aralıktaki tüm boş slotlar silinsin mi?",
       weekdayShort: ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"],
     },
+    gallery: {
+      title: "Galeri",
+      subtitle:
+        "Ana sayfada gösterilen galeri kartları. Görsel URL'si ekleyin — küçük sıra numarası önce görünür.",
+      addNew: "Yeni Görsel",
+      editTitle: "Görseli Düzenle",
+      newTitle: "Yeni Görsel Ekle",
+      fields: {
+        url: "Görsel URL",
+        urlHint: "Doğrudan .jpg / .png / .webp bağlantısı olmalı",
+        alt: "Alternatif metin (SEO)",
+        sortOrder: "Sıra",
+        isActive: "Aktif (sitede göster)",
+      },
+      preview: "Önizleme",
+      previewFailed: "Görsel yüklenemedi",
+      toastCreated: "Görsel eklendi",
+      toastUpdated: "Görsel güncellendi",
+      toastDeleted: "Görsel silindi",
+      toastToggled: "Durum güncellendi",
+    },
   },
 };
+
 
 
 
