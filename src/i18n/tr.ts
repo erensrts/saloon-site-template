@@ -201,6 +201,29 @@ export const tr = {
       toastDeleted: "Görsel silindi",
       toastToggled: "Durum güncellendi",
     },
+    appointments: {
+      title: "Randevular",
+      subtitle:
+        "Müşteri talepleri. Durumu güncelleyin veya iptal edin — silinen randevunun slotu tekrar boşa çıkar.",
+      refresh: "Yenile",
+      searchLabel: "Ara",
+      searchPlaceholder: "İsim, telefon veya e-posta…",
+      columns: {
+        when: "Tarih & Saat",
+        customer: "Müşteri",
+        service: "Hizmet",
+        status: "Durum",
+      },
+      status: {
+        all: "Tümü",
+        pending: "Bekliyor",
+        confirmed: "Onaylandı",
+        completed: "Tamamlandı",
+        cancelled: "İptal",
+      },
+      toastStatusUpdated: "Durum güncellendi",
+      toastDeleted: "Randevu silindi",
+    },
   },
 };
 
