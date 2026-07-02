@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ServicesTab } from "@/components/admin/ServicesTab";
 import { WorkingHoursTab } from "@/components/admin/WorkingHoursTab";
 import { SlotsTab } from "@/components/admin/SlotsTab";
+import { GalleryTab } from "@/components/admin/GalleryTab";
+
 
 
 import { t } from "@/i18n";
