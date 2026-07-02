@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { MapPin, Phone, Mail, Clock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { t, intlLocale } from "@/i18n";
 import { useSiteData } from "./SiteDataProvider";
+import { bookAppointment, fetchFreeSlots, type FreeSlot } from "@/lib/booking";
 
 const v = t.booking.validation;
 const bookingSchema = z.object({
@@ -22,10 +23,26 @@ const bookingSchema = z.object({
     .optional()
     .or(z.literal("")),
   service: z.string().min(1, v.service),
-  date: z.string().min(1, v.date),
-  time: z.string().min(1, v.time),
+  slotId: z.string().uuid(v.time),
   note: z.string().max(500).optional().or(z.literal("")),
 });
+
+function todayIso(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function plusDaysIso(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
 function formatDateLocalized(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
@@ -42,11 +59,55 @@ function formatDateLocalized(iso: string): string {
   }
 }
 
+/** HH:MM:SS → HH:MM */
+function shortTime(s: string): string {
+  return s.length >= 5 ? s.slice(0, 5) : s;
+}
+
 export function Booking() {
   const site = useSiteData();
   const [submitting, setSubmitting] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [selectedSlotId, setSelectedSlotId] = useState<string>("");
+  const [slots, setSlots] = useState<FreeSlot[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const minDate = todayIso();
+  const maxDate = plusDaysIso(120);
+
+  // Fetch free slots for the picked date.
+  useEffect(() => {
+    if (!selectedDate) {
+      setSlots([]);
+      setSelectedSlotId("");
+      return;
+    }
+    let cancelled = false;
+    setSlotsLoading(true);
+    fetchFreeSlots({ from: selectedDate, to: selectedDate })
+      .then((rows) => {
+        if (cancelled) return;
+        setSlots(rows);
+        setSelectedSlotId("");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setSlots([]);
+      })
+      .finally(() => {
+        if (!cancelled) setSlotsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedDate]);
+
+  const timeOptions = useMemo(
+    () => slots.map((s) => ({ id: s.id, label: shortTime(s.time), time: s.time })),
+    [slots],
+  );
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formEl = e.currentTarget;
     const fd = new FormData(formEl);
@@ -56,8 +117,7 @@ export function Booking() {
       phone: String(fd.get("phone") ?? ""),
       email: String(fd.get("email") ?? ""),
       service: String(fd.get("service") ?? ""),
-      date: String(fd.get("date") ?? ""),
-      time: String(fd.get("time") ?? ""),
+      slotId: selectedSlotId,
       note: String(fd.get("note") ?? ""),
     };
 
@@ -68,10 +128,43 @@ export function Booking() {
       return;
     }
 
+    const slot = slots.find((s) => s.id === selectedSlotId);
+    if (!slot) {
+      toast.error(t.booking.validation.time);
+      return;
+    }
+
     setSubmitting(true);
     const val = parsed.data;
-    const wa = t.booking.waMessage;
+    try {
+      await bookAppointment({
+        slotId: val.slotId,
+        name: val.name,
+        phone: val.phone,
+        service: val.service,
+        email: val.email || null,
+        note: val.note || null,
+      });
+    } catch (err) {
+      setSubmitting(false);
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("slot_unavailable")) {
+        toast.error(t.booking.validation.slotTaken);
+        // Refresh slots for this date
+        fetchFreeSlots({ from: selectedDate, to: selectedDate })
+          .then(setSlots)
+          .catch(() => {});
+        setSelectedSlotId("");
+      } else if (msg.includes("slot_past")) {
+        toast.error(t.booking.validation.slotPast);
+      } else {
+        toast.error(t.booking.validation.saveFailed);
+      }
+      return;
+    }
 
+    // WhatsApp handoff (best-effort; booking already saved server-side).
+    const wa = t.booking.waMessage;
     const lines = [
       wa.intro,
       "",
@@ -79,18 +172,22 @@ export function Booking() {
       `${wa.phone}: ${val.phone}`,
       ...(val.email ? [`${wa.email}: ${val.email}`] : []),
       `${wa.service}: ${val.service}`,
-      `${wa.date}: ${formatDateLocalized(val.date)}`,
-      `${wa.time}: ${val.time}`,
+      `${wa.date}: ${formatDateLocalized(slot.date)}`,
+      `${wa.time}: ${shortTime(slot.time)}`,
       ...(val.note ? [`${wa.note}: ${val.note}`] : []),
     ];
     const message = lines.join("\n");
     const url = `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(message)}`;
 
-    window.open(url, "_blank", "noopener,noreferrer");
     toast.success(t.booking.toastSuccess);
     formEl.reset();
+    setSelectedDate("");
+    setSelectedSlotId("");
+    setSlots([]);
     setSubmitting(false);
+    window.open(url, "_blank", "noopener,noreferrer");
   };
+
 
   const f = t.booking.fields;
 
