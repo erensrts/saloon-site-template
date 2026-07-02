@@ -128,7 +128,9 @@ function AdminPage() {
             <TabsTrigger value="gallery" className="rounded-xl">
               {ta.tabs.gallery}
             </TabsTrigger>
-
+            <TabsTrigger value="content" className="rounded-xl">
+              {ta.tabs.content}
+            </TabsTrigger>
 
             {placeholderTabs.map((tab) => (
               <TabsTrigger key={tab.value} value={tab.value} className="rounded-xl">
