@@ -249,6 +249,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      book_appointment: {
+        Args: {
+          _email?: string
+          _name: string
+          _note?: string
+          _phone: string
+          _service: string
+          _slot_id: string
+        }
+        Returns: string
+      }
       claim_first_admin: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {

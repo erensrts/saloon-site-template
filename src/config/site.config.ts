@@ -149,6 +149,8 @@ export const siteConfig = {
     favicon: "/favicon.ico",
     ogImage: "/og-image.jpg",
     language: "tr",
+    /** Canonical / production URL used by sitemap.xml + robots.txt. */
+    siteUrl: "https://lumiere-beauty.lovable.app",
   },
 };
 
