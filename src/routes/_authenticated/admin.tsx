@@ -161,6 +161,10 @@ function AdminPage() {
             <GalleryTab />
           </TabsContent>
 
+          <TabsContent value="content" className="mt-0">
+            <ContentTab />
+          </TabsContent>
+
 
 
 
