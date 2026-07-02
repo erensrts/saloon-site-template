@@ -1,46 +1,49 @@
-## Plan: Kuaför / Güzellik Salonu Şablon Sitesi (Onaylandı + 2 Ek)
+# Plan: DB-Destekli, Admin Panelli, Çok Dilli Salon Şablonu (Onaylandı)
 
-### Onaylanmış Yapı (Özet)
-Tek sayfa, 7 bölüm: Hero → Hizmetler → Galeri → Hakkımızda → Yorumlar → Randevu/İletişim → Footer. Sabit WhatsApp butonu. Pudra/bej/altın renk paleti. Mobil öncelikli, hafif animasyonlar. Merkezi `src/config/site.config.ts` ile tüm içerik ve renkler yönetilecek.
+## Netleşen Kararlar
+1. **Profiles tablosu YOK** — sadece `auth.users` + `user_roles` + `has_role()`.
+2. **Slotlar toplu üretilir** — admin çalışma saati + aralık girer, sistem `availability_slots`'u otomatik doldurur.
 
-### Eklenen Gereksinim 1 — Demo İçerik
+## Uygulama Sırası (6 Faz — her faz sonunda test için durulur)
 
-Şablon "boş" görünmesin diye config dosyası gerçekçi demo verilerle doldurulacak:
+### Faz 1 — i18n İskeleti (SIRADAKİ)
+- `src/i18n/tr.ts`, `src/i18n/en.ts` sözlükleri (nav, form etiketleri, toast'lar, gelecekteki admin UI stringleri).
+- `src/i18n/index.ts` → `t(key)` helper, `siteConfig.locale` okur.
+- `site.config.ts`'e `locale: "tr"` alanı.
+- Public bileşenlerdeki sabit TR stringleri `t(...)`'a taşınır. Görsel çıktı birebir aynı.
+- `<html lang>` ve `head` meta locale'e bağlanır.
+- **Risk:** Düşük. **Test:** Site aynı görünmeli; `locale` "en" yapıldığında UI İngilizce görünmeli.
 
-- **Hizmetler (6 adet):** Saç Kesimi & Fön (250–450₺), Saç Boyama (800–1500₺), Manikür & Pedikür (350–550₺), Cilt Bakımı (600–900₺), Kaş & Kirpik Tasarımı (200–350₺), Makyaj (500–1200₺). Her biri Lucide ikonu + 1–2 cümlelik Türkçe açıklama.
-- **Galeri (8–10 görsel):** `imagegen` ile üretilecek gerçekçi salon/saç/makyaj fotoğrafları. `src/assets/gallery/` altında ES6 import edilecek.
-- **Ekip (3 kişi):** Türkçe isim + rol (Baş Stilist, Cilt Uzmanı, Makyaj Sanatçısı) + `imagegen` ile üretilmiş profesyonel portre.
-- **Yorumlar (4–5 adet):** Türkçe gerçekçi müşteri yorumları, isim ve 5 yıldız.
-- **Hero:** `imagegen` ile üretilmiş sıcak tonlu salon iç mekan görseli.
-- **Hakkımızda:** 2 paragraflık örnek işletme hikayesi.
-- **İletişim:** Örnek İstanbul adresi, telefon, çalışma saatleri, sahte WhatsApp numarası.
+### Faz 2 — Lovable Cloud + Şema + Public Okuma
+- Cloud aktif, migration'lar: `services`, `gallery_images`, `working_hours`, `availability_slots`, `site_content`, `appointments`, `user_roles` — hepsinde `language text not null default 'tr'`, GRANT'ler, RLS, `has_role()`.
+- Seed migration: bugünkü `site.config.ts` içeriği `tr` locale ile eklenir.
+- Public bileşenler publishable-key server fn'lerle veri çeker; DB hatası → config fallback.
+- **Test:** Site DB'den okuyor mu, DB'yi bozunca fallback devreye giriyor mu.
 
-Tüm metinler config'te ortada — gerçek işletmeye uyarlama tek dosya düzenlemesiyle bitecek.
+### Faz 3 — Auth + `/admin` Kabuğu
+- Supabase Email/Password auth.
+- `/auth` public giriş sayfası.
+- `_authenticated/route.tsx` (managed gate, `ssr: false`).
+- `/_authenticated/admin` + `has_role(uid, 'admin')` ikinci kapı.
+- `noindex, nofollow` meta + `robots.txt`'te `Disallow: /admin`, `/auth`.
+- **Test:** Admin'e girişsiz erişilemez, admin olmayan kullanıcı reddedilir.
 
-### Eklenen Gereksinim 2 — SEO Alanları (site.config.ts)
+### Faz 4 — Admin Dashboard (6 sekme)
+Randevular / Hizmetler / Galeri / Çalışma Saatleri / Boş Zaman Dilimleri (toplu üretici) / Site İçeriği. Tüm yazma işlemleri `requireSupabaseAuth` + `has_role` kontrollü server fn.
 
-Config'e `seo` bölümü eklenecek:
+### Faz 5 — Görsel Upload + Client-Side WebP
+- Supabase Storage `gallery` bucket.
+- Admin'de canvas → `toBlob('image/webp', 0.85)`; sadece WebP yüklenir. Safari fallback.
 
-```ts
-seo: {
-  title: "Lumière Beauty Studio — İstanbul Güzellik Salonu",
-  description: "Saç, cilt, makyaj ve bakım hizmetlerinde profesyonel dokunuş. Hemen online randevu alın.",
-  favicon: "/favicon.ico",
-  ogImage: "/og-image.jpg", // hero görseli baz alınacak
-  language: "tr",
-}
-```
+### Faz 6 — Booking → DB + Sitemap
+- Booking formu boş slot'ları DB'den çeker; submit `appointments`'a INSERT + slot'u atomik olarak doldurur; WhatsApp yönlendirmesi korunur.
+- `src/routes/sitemap[.]xml.ts` (sadece public route'lar).
+- `robots.txt` güncellenir.
 
-Bu değerler `src/routes/index.tsx` içindeki `head()` fonksiyonuna bağlanacak (title, description, og:title, og:description, og:image, canonical). Favicon yolu `__root.tsx` içindeki `links` dizisinde config'ten okunacak.
+## Riskler (özet)
+- RLS/GRANT eksikliği → 401: her tablo için checklist.
+- Service role sızıntısı: `client.server` sadece `.server.ts` + handler içinde `await import(...)`.
+- Slot çakışması: `UPDATE ... WHERE dolu=false RETURNING` idempotent yazım.
+- Config↔DB çift kaynak: Faz 2 sonunda config sadece `locale`, `seo`, WhatsApp numarası gibi build-time sabitleri tutar.
 
-### Build Sırası (Bileşen Bileşen)
-
-1. `src/config/site.config.ts` — tüm içerik + tema + SEO
-2. `src/styles.css` — config renklerini CSS değişkenlerine bağla, fontları tanımla (DM Serif Display + DM Sans, root `__root.tsx` head'inde `<link>` ile yüklenecek)
-3. `imagegen` çağrıları — hero, galeri (8), ekip (3) görselleri `src/assets/` altına
-4. Bileşenler: `Navbar` → `HeroSection` → `ServicesSection` → `GallerySection` → `AboutSection` → `TestimonialsSection` → `BookingSection` (form + harita + saatler) → `Footer` → `WhatsAppButton`
-5. `src/routes/index.tsx` — bileşenleri compose et + `head()` SEO bağlantısı
-6. `src/routes/__root.tsx` — favicon ve font `<link>` etiketleri
-7. Mobil ve masaüstü preview ile görsel doğrulama
-
-Plan onaylandığında build aşamasına geçeceğim.
+Faz 1'e başlıyorum, biter bitmez durup test için bildireceğim.
