@@ -81,9 +81,9 @@ function AdminPage() {
 
   const placeholderTabs: { value: string; label: string }[] = [
     { value: "appointments", label: ta.tabs.appointments },
-    { value: "gallery", label: ta.tabs.gallery },
     { value: "content", label: ta.tabs.content },
   ];
+
 
 
 
@@ -123,6 +123,10 @@ function AdminPage() {
             <TabsTrigger value="slots" className="rounded-xl">
               {ta.tabs.slots}
             </TabsTrigger>
+            <TabsTrigger value="gallery" className="rounded-xl">
+              {ta.tabs.gallery}
+            </TabsTrigger>
+
             {placeholderTabs.map((tab) => (
               <TabsTrigger key={tab.value} value={tab.value} className="rounded-xl">
                 {tab.label}
@@ -142,6 +146,12 @@ function AdminPage() {
           <TabsContent value="slots" className="mt-0">
             <SlotsTab />
           </TabsContent>
+
+          <TabsContent value="gallery" className="mt-0">
+            <GalleryTab />
+          </TabsContent>
+
+
 
 
 
