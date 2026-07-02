@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/config/site.config";
+import { t } from "@/i18n";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "#services", label: "Hizmetler" },
-  { href: "#gallery", label: "Galeri" },
-  { href: "#about", label: "Hakkımızda" },
-  { href: "#testimonials", label: "Yorumlar" },
-  { href: "#booking", label: "İletişim" },
+  { href: "#services", label: t.nav.services },
+  { href: "#gallery", label: t.nav.gallery },
+  { href: "#about", label: t.nav.about },
+  { href: "#testimonials", label: t.nav.testimonials },
+  { href: "#booking", label: t.nav.contact },
 ];
 
 export function Navbar() {
@@ -53,13 +54,13 @@ export function Navbar() {
           href="#booking"
           className="hidden md:inline-flex items-center rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition"
         >
-          {siteConfig.heroCta}
+          {t.nav.cta}
         </a>
 
         <button
           onClick={() => setOpen((v) => !v)}
           className="md:hidden p-2 text-foreground"
-          aria-label="Menüyü aç/kapat"
+          aria-label={t.nav.toggleMenu}
         >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -85,7 +86,7 @@ export function Navbar() {
                 onClick={() => setOpen(false)}
                 className="block w-full rounded-full bg-primary py-3 text-center font-medium text-primary-foreground"
               >
-                {siteConfig.heroCta}
+                {t.nav.cta}
               </a>
             </li>
           </ul>
