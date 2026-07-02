@@ -1,7 +1,8 @@
-import { siteConfig } from "@/config/site.config";
 import { t } from "@/i18n";
+import { useSiteData } from "./SiteDataProvider";
 
 export function Gallery() {
+  const site = useSiteData();
   return (
     <section id="gallery" className="section-padding">
       <div className="container-narrow">
@@ -13,7 +14,7 @@ export function Gallery() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-          {siteConfig.gallery.map((src, i) => (
+          {site.gallery.map((src, i) => (
             <div
               key={i}
               className={`overflow-hidden rounded-2xl bg-muted ${

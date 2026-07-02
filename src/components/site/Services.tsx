@@ -1,9 +1,10 @@
 import * as Icons from "lucide-react";
-import { siteConfig } from "@/config/site.config";
 import { t } from "@/i18n";
+import { useSiteData } from "./SiteDataProvider";
 import type { LucideIcon } from "lucide-react";
 
 export function Services() {
+  const site = useSiteData();
   return (
     <section id="services" className="section-padding bg-secondary/40">
       <div className="container-narrow">
@@ -15,7 +16,7 @@ export function Services() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {siteConfig.services.map((s) => {
+          {site.services.map((s) => {
             const Icon = (Icons as unknown as Record<string, LucideIcon>)[s.icon] ?? Icons.Sparkles;
             return (
               <article

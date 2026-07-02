@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { siteConfig } from "@/config/site.config";
 import { t } from "@/i18n";
 import { cn } from "@/lib/utils";
+import { useSiteData } from "./SiteDataProvider";
 
 const links = [
   { href: "#services", label: t.nav.services },
@@ -13,6 +13,7 @@ const links = [
 ];
 
 export function Navbar() {
+  const site = useSiteData();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -33,7 +34,7 @@ export function Navbar() {
     >
       <nav className="container-narrow flex h-16 items-center justify-between md:h-20">
         <a href="#top" className="font-display text-2xl font-semibold tracking-tight text-foreground">
-          {siteConfig.businessName}
+          {site.businessName}
           <span className="text-primary">.</span>
         </a>
 

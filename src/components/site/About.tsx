@@ -1,19 +1,20 @@
-import { siteConfig } from "@/config/site.config";
 import { t } from "@/i18n";
+import { useSiteData } from "./SiteDataProvider";
 
 export function About() {
+  const site = useSiteData();
   return (
     <section id="about" className="section-padding bg-secondary/40">
       <div className="container-narrow">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="order-2 lg:order-1">
             <p className="text-primary text-sm uppercase tracking-[0.2em] mb-3">
-              {siteConfig.about.title}
+              {site.about.title}
             </p>
             <h2 className="text-4xl md:text-5xl font-medium leading-tight mb-6">
-              {siteConfig.about.subtitle}
+              {site.about.subtitle}
             </h2>
-            {siteConfig.about.paragraphs.map((p, i) => (
+            {site.about.paragraphs.map((p, i) => (
               <p key={i} className="text-muted-foreground leading-relaxed mb-4 text-[15px]">
                 {p}
               </p>
@@ -22,7 +23,7 @@ export function About() {
           <div className="order-1 lg:order-2 relative">
             <div className="aspect-[4/5] overflow-hidden rounded-3xl">
               <img
-                src={siteConfig.about.image}
+                src={site.about.image}
                 alt={t.about.imageAlt}
                 loading="lazy"
                 width={1200}
@@ -39,7 +40,7 @@ export function About() {
         <div className="mt-20 md:mt-28">
           <h3 className="font-display text-3xl md:text-4xl mb-10 text-center">{t.about.teamHeading}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {siteConfig.team.map((m) => (
+            {site.team.map((m) => (
               <div key={m.name} className="text-center group">
                 <div className="aspect-square overflow-hidden rounded-3xl mb-4 bg-muted">
                   <img
