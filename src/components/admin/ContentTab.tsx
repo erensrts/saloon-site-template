@@ -148,25 +148,29 @@ function parseAbout(v: JsonValue | undefined): AboutValue {
 function parseTeam(v: JsonValue | undefined): TeamValue {
   const o = isObj(v) ? v : {};
   const arr = Array.isArray(o.members) ? o.members : [];
-  const members = arr
-    .filter(isObj)
-    .map((m) => ({
-      name: s(m.name),
-      role: s(m.role),
-      image: s(m.image),
-    }));
+  const members: TeamMember[] = [];
+  for (const raw of arr) {
+    if (!isObj(raw)) continue;
+    members.push({
+      name: s(raw.name),
+      role: s(raw.role),
+      image: s(raw.image),
+    });
+  }
   return { members: members.length ? members : [...defaults.team.members] };
 }
 function parseTestimonials(v: JsonValue | undefined): TestimonialsValue {
   const o = isObj(v) ? v : {};
   const arr = Array.isArray(o.items) ? o.items : [];
-  const items = arr
-    .filter(isObj)
-    .map((m) => ({
-      name: s(m.name),
-      text: s(m.text),
-      rating: Math.max(1, Math.min(5, Math.round(n(m.rating, 5)))),
-    }));
+  const items: TestimonialItem[] = [];
+  for (const raw of arr) {
+    if (!isObj(raw)) continue;
+    items.push({
+      name: s(raw.name),
+      text: s(raw.text),
+      rating: Math.max(1, Math.min(5, Math.round(n(raw.rating, 5)))),
+    });
+  }
   return {
     items: items.length ? items : [...defaults.testimonials.items],
   };
