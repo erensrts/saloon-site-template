@@ -82,6 +82,7 @@ export const tr = {
   whatsapp: {
     defaultLabel: "Bize Yazın",
   },
-} as const;
+};
 
 export type Dictionary = typeof tr;
+
