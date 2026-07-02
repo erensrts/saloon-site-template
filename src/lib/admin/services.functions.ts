@@ -2,20 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-/** Ensure caller has the admin role; otherwise throw. */
-async function assertAdmin(context: {
-  supabase: ReturnType<
-    Awaited<
-      ReturnType<typeof requireSupabaseAuth.server>
-    >["next"] extends never
-      ? never
-      : never
-  >;
-}): Promise<void> {
-  // narrow inference — real check below
-  void context;
-}
-
 export type ServiceRow = {
   id: string;
   language: string;
@@ -49,18 +35,6 @@ const listSchema = z
   .object({ language: z.string().min(2).max(5).default("tr") })
   .default({ language: "tr" });
 
-async function checkAdmin(
-  supabase: Awaited<ReturnType<typeof requireSupabaseAuth.server>> extends never
-    ? never
-    : ReturnType<typeof createServerFn> extends never
-      ? never
-      : never,
-): Promise<never> {
-  void supabase;
-  throw new Error("unused");
-}
-void assertAdmin;
-void checkAdmin;
 
 /** List all services (including inactive) for the admin UI. */
 export const adminListServices = createServerFn({ method: "GET" })
