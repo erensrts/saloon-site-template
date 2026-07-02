@@ -139,9 +139,14 @@ function AdminPage() {
 
           </TabsList>
 
+          <TabsContent value="appointments" className="mt-0">
+            <AppointmentsTab />
+          </TabsContent>
+
           <TabsContent value="services" className="mt-0">
             <ServicesTab />
           </TabsContent>
+
 
           <TabsContent value="hours" className="mt-0">
             <WorkingHoursTab />
