@@ -11,11 +11,19 @@ type ServiceRow = {
 type GalleryRow = { url: string; alt: string; sort_order: number };
 type HoursRow = { day_label: string; time_label: string; sort_order: number };
 
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [k: string]: JsonValue };
+
 export type PublicSiteData = {
   services: ServiceRow[];
   gallery: GalleryRow[];
   hours: HoursRow[];
-  content: Record<string, unknown>;
+  content: Record<string, JsonValue>;
 } | null;
 
 /**
