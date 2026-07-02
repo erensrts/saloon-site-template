@@ -19,7 +19,7 @@ import t3 from "@/assets/team/t3.jpg";
  */
 export const siteConfig = {
   /** Aktif dil — tüm UI stringleri bu locale'den okunur. */
-  locale: "en" as "tr" | "en",
+  locale: "en" as "en" | "tr",
   businessName: "Lumière",
   businessNameSuffix: "Beauty Studio",
   tagline: "Güzelliğinizi aydınlatıyoruz",
