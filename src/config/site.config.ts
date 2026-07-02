@@ -18,6 +18,8 @@ import t3 from "@/assets/team/t3.jpg";
  * uyarlamak için sadece bu dosyadaki değerleri değiştirin.
  */
 export const siteConfig = {
+  /** Aktif dil — tüm UI stringleri bu locale'den okunur. */
+  locale: "tr" as "tr" | "en",
   businessName: "Lumière",
   businessNameSuffix: "Beauty Studio",
   tagline: "Güzelliğinizi aydınlatıyoruz",
