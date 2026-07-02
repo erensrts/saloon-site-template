@@ -9,6 +9,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ServicesTab } from "@/components/admin/ServicesTab";
 import { WorkingHoursTab } from "@/components/admin/WorkingHoursTab";
+import { SlotsTab } from "@/components/admin/SlotsTab";
+
 
 import { t } from "@/i18n";
 
