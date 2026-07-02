@@ -79,10 +79,10 @@ function AdminPage() {
 
   const placeholderTabs: { value: string; label: string }[] = [
     { value: "appointments", label: ta.tabs.appointments },
-    { value: "slots", label: ta.tabs.slots },
     { value: "gallery", label: ta.tabs.gallery },
     { value: "content", label: ta.tabs.content },
   ];
+
 
 
   return (
@@ -118,11 +118,15 @@ function AdminPage() {
             <TabsTrigger value="hours" className="rounded-xl">
               {ta.tabs.hours}
             </TabsTrigger>
+            <TabsTrigger value="slots" className="rounded-xl">
+              {ta.tabs.slots}
+            </TabsTrigger>
             {placeholderTabs.map((tab) => (
               <TabsTrigger key={tab.value} value={tab.value} className="rounded-xl">
                 {tab.label}
               </TabsTrigger>
             ))}
+
           </TabsList>
 
           <TabsContent value="services" className="mt-0">
@@ -132,6 +136,12 @@ function AdminPage() {
           <TabsContent value="hours" className="mt-0">
             <WorkingHoursTab />
           </TabsContent>
+
+          <TabsContent value="slots" className="mt-0">
+            <SlotsTab />
+          </TabsContent>
+
+
 
 
           {placeholderTabs.map((tab) => (
