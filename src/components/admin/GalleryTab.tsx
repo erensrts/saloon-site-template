@@ -389,3 +389,80 @@ function GalleryEditor({
     </Dialog>
   );
 }
+
+function UploadField({
+  value,
+  onUploaded,
+}: {
+  value: string;
+  onUploaded: (url: string) => void;
+}) {
+  const tt = t.admin.gallery;
+  const tc = t.admin.common;
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [webpSupported] = useState(() =>
+    typeof document !== "undefined" ? isWebpEncodeSupported() : true,
+  );
+
+  const handleFile = async (file: File | null | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error(tt.toastUnsupportedFile);
+      return;
+    }
+    setUploading(true);
+    try {
+      const res = await uploadGalleryImage(file);
+      onUploaded(res.publicUrl);
+      toast.success(tt.toastUploaded);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg === "file_too_large") toast.error(tt.toastFileTooLarge);
+      else if (msg === "unsupported_file_type")
+        toast.error(tt.toastUnsupportedFile);
+      else toast.error(`${tt.toastUploadFailed}: ${msg || tc.error}`);
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="grid gap-2 rounded-lg border border-dashed border-border/70 bg-muted/30 p-3">
+      <Label>{tt.fields.upload}</Label>
+      <div className="flex items-center gap-2">
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={(e) => handleFile(e.target.files?.[0])}
+        />
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+        >
+          {uploading ? (
+            <>
+              <Loader2 className="animate-spin" size={14} />
+              {tt.fields.uploading}
+            </>
+          ) : (
+            <>
+              <Upload size={14} />
+              {value ? tt.fields.replace : tt.fields.chooseFile}
+            </>
+          )}
+        </Button>
+        <p className="text-xs text-muted-foreground">{tt.fields.uploadHint}</p>
+      </div>
+      {!webpSupported && (
+        <p className="text-[11px] text-amber-600">{tt.fields.webpFallback}</p>
+      )}
+    </div>
+  );
+}
