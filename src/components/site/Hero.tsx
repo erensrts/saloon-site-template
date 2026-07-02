@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config/site.config";
+import { t } from "@/i18n";
 
 export function Hero() {
   const fullName = `${siteConfig.businessName} ${siteConfig.businessNameSuffix}`.trim();
@@ -41,13 +42,13 @@ export function Hero() {
               href="#booking"
               className="inline-flex items-center rounded-full bg-primary px-7 py-3.5 text-base font-medium text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 transition"
             >
-              {siteConfig.heroCta}
+              {t.nav.cta}
             </a>
             <a
               href="#services"
               className="inline-flex items-center rounded-full border border-foreground/20 bg-background/60 backdrop-blur px-7 py-3.5 text-base font-medium text-foreground hover:bg-background transition"
             >
-              Hizmetlerimiz
+              {t.hero.ourServices}
             </a>
           </div>
         </div>

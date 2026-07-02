@@ -1,5 +1,6 @@
 import * as Icons from "lucide-react";
 import { siteConfig } from "@/config/site.config";
+import { t } from "@/i18n";
 import type { LucideIcon } from "lucide-react";
 
 export function Services() {
@@ -7,9 +8,9 @@ export function Services() {
     <section id="services" className="section-padding bg-secondary/40">
       <div className="container-narrow">
         <div className="max-w-2xl mb-12 md:mb-16">
-          <p className="text-primary text-sm uppercase tracking-[0.2em] mb-3">Hizmetler</p>
+          <p className="text-primary text-sm uppercase tracking-[0.2em] mb-3">{t.services.eyebrow}</p>
           <h2 className="text-4xl md:text-5xl font-medium leading-tight">
-            Sizin için özenle seçilmiş bakımlar
+            {t.services.heading}
           </h2>
         </div>
 
@@ -30,7 +31,7 @@ export function Services() {
                 </p>
                 <div className="pt-4 border-t border-border/50 flex items-center justify-between">
                   <span className="text-xs uppercase tracking-wider text-muted-foreground">
-                    Fiyat
+                    {t.services.priceLabel}
                   </span>
                   <span className="font-medium text-primary">{s.price}</span>
                 </div>

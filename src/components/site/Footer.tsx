@@ -1,5 +1,6 @@
 import { Instagram, Facebook } from "lucide-react";
 import { siteConfig } from "@/config/site.config";
+import { t } from "@/i18n";
 
 export function Footer() {
   return (
@@ -15,7 +16,7 @@ export function Footer() {
         </div>
 
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-background/50 mb-3">İletişim</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-background/50 mb-3">{t.footer.contact}</p>
           <ul className="space-y-1.5 text-sm text-background/85">
             <li>{siteConfig.contact.address}</li>
             <li>{siteConfig.contact.phone}</li>
@@ -24,7 +25,7 @@ export function Footer() {
         </div>
 
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-background/50 mb-3">Takip Edin</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-background/50 mb-3">{t.footer.follow}</p>
           <div className="flex gap-3">
             {[
               { href: siteConfig.social.instagram, Icon: Instagram, label: "Instagram" },
@@ -46,8 +47,8 @@ export function Footer() {
       </div>
 
       <div className="container-narrow mt-10 pt-6 border-t border-background/10 text-xs text-background/50 flex flex-wrap justify-between gap-2">
-        <span>© {new Date().getFullYear()} {siteConfig.businessName} {siteConfig.businessNameSuffix}. Tüm hakları saklıdır.</span>
-        <span>Tasarım & geliştirme şablonu</span>
+        <span>{t.footer.rights(new Date().getFullYear(), `${siteConfig.businessName} ${siteConfig.businessNameSuffix}`)}</span>
+        <span>{t.footer.credit}</span>
       </div>
     </footer>
   );

@@ -1,9 +1,10 @@
 import { siteConfig } from "@/config/site.config";
+import { t } from "@/i18n";
 
 export function WhatsAppButton() {
   const { whatsapp, whatsappMessage, whatsappLabel } = siteConfig.contact;
   const href = `https://wa.me/${whatsapp}?text=${encodeURIComponent(whatsappMessage)}`;
-  const label = whatsappLabel ?? "Bize Yazın";
+  const label = whatsappLabel ?? t.whatsapp.defaultLabel;
 
   return (
     <>
