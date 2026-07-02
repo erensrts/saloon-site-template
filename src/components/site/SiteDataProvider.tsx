@@ -15,7 +15,7 @@ const SiteDataContext = createContext<SiteData>(FALLBACK_SITE_DATA);
 export function SiteDataProvider({ children }: { children: ReactNode }) {
   const { data } = useQuery({
     ...siteDataQueryOptions,
-    initialData: FALLBACK_SITE_DATA,
+    placeholderData: FALLBACK_SITE_DATA,
   });
   return (
     <SiteDataContext.Provider value={data ?? FALLBACK_SITE_DATA}>
