@@ -82,7 +82,61 @@ export const tr = {
   whatsapp: {
     defaultLabel: "Bize Yazın",
   },
+  admin: {
+    title: "Admin Paneli",
+    eyebrow: "Yönetim",
+    signOut: "Çıkış",
+    welcome: "Hoş geldiniz",
+    tabs: {
+      appointments: "Randevular",
+      services: "Hizmetler",
+      hours: "Çalışma Saatleri",
+      slots: "Boş Zaman Dilimleri",
+      gallery: "Galeri",
+      content: "Site İçeriği",
+    },
+    common: {
+      save: "Kaydet",
+      saving: "Kaydediliyor…",
+      cancel: "Vazgeç",
+      edit: "Düzenle",
+      delete: "Sil",
+      add: "Ekle",
+      confirm: "Onayla",
+      loading: "Yükleniyor…",
+      empty: "Kayıt yok",
+      error: "Bir hata oluştu",
+      active: "Aktif",
+      inactive: "Pasif",
+      order: "Sıra",
+      required: "Zorunlu",
+      confirmDelete: "Silmek istediğinize emin misiniz?",
+      soon: "Yakında",
+    },
+    services: {
+      title: "Hizmetler",
+      subtitle:
+        "Ana sayfada görünen hizmet kartları. Sıra numarası küçük olan üstte görünür.",
+      addNew: "Yeni Hizmet",
+      editTitle: "Hizmeti Düzenle",
+      newTitle: "Yeni Hizmet Ekle",
+      fields: {
+        name: "Ad",
+        description: "Açıklama",
+        price: "Fiyat",
+        icon: "İkon (lucide adı)",
+        iconHint: "Örn: Sparkles, Scissors, Heart, Star, Flower, Palette",
+        sortOrder: "Sıra",
+        isActive: "Aktif (sitede göster)",
+      },
+      toastCreated: "Hizmet eklendi",
+      toastUpdated: "Hizmet güncellendi",
+      toastDeleted: "Hizmet silindi",
+      toastToggled: "Durum güncellendi",
+    },
+  },
 };
 
 export type Dictionary = typeof tr;
+
 
