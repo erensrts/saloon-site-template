@@ -183,7 +183,7 @@ export const tr = {
     gallery: {
       title: "Galeri",
       subtitle:
-        "Ana sayfada gösterilen galeri kartları. Görsel URL'si ekleyin — küçük sıra numarası önce görünür.",
+        "Ana sayfada gösterilen galeri kartları. Dosya yükleyin veya doğrudan bir URL girin — küçük sıra numarası önce görünür.",
       addNew: "Yeni Görsel",
       editTitle: "Görseli Düzenle",
       newTitle: "Yeni Görsel Ekle",
@@ -193,11 +193,23 @@ export const tr = {
         alt: "Alternatif metin (SEO)",
         sortOrder: "Sıra",
         isActive: "Aktif (sitede göster)",
+        upload: "Dosyadan yükle",
+        uploadHint:
+          "Otomatik WebP'ye dönüştürülür ve en büyük kenar 2000 px'e küçültülür.",
+        chooseFile: "Dosya seç",
+        uploading: "Yükleniyor…",
+        webpFallback:
+          "Tarayıcınız WebP oluşturamıyor — orijinal biçimde yükleniyor.",
+        replace: "Değiştir",
       },
       preview: "Önizleme",
       previewFailed: "Görsel yüklenemedi",
       toastCreated: "Görsel eklendi",
       toastUpdated: "Görsel güncellendi",
+      toastUploaded: "Yükleme tamamlandı",
+      toastUploadFailed: "Yükleme başarısız",
+      toastUnsupportedFile: "Sadece görsel dosyaları yüklenebilir",
+      toastFileTooLarge: "Dosya çok büyük (maks. 15 MB)",
       toastDeleted: "Görsel silindi",
       toastToggled: "Durum güncellendi",
     },

@@ -184,7 +184,7 @@ export const en: Dictionary = {
     gallery: {
       title: "Gallery",
       subtitle:
-        "Gallery cards shown on the homepage. Paste image URLs — lower order numbers appear first.",
+        "Gallery cards shown on the homepage. Upload a file or paste a URL — lower order numbers appear first.",
       addNew: "New image",
       editTitle: "Edit image",
       newTitle: "Add image",
@@ -194,11 +194,23 @@ export const en: Dictionary = {
         alt: "Alt text (SEO)",
         sortOrder: "Order",
         isActive: "Active (show on site)",
+        upload: "Upload from file",
+        uploadHint:
+          "Auto-converted to WebP and downscaled to a max 2000 px edge.",
+        chooseFile: "Choose file",
+        uploading: "Uploading…",
+        webpFallback:
+          "Your browser can't encode WebP — uploading in original format.",
+        replace: "Replace",
       },
       preview: "Preview",
       previewFailed: "Failed to load image",
       toastCreated: "Image added",
       toastUpdated: "Image updated",
+      toastUploaded: "Upload complete",
+      toastUploadFailed: "Upload failed",
+      toastUnsupportedFile: "Only image files can be uploaded",
+      toastFileTooLarge: "File too large (max 15 MB)",
       toastDeleted: "Image removed",
       toastToggled: "Status updated",
     },
