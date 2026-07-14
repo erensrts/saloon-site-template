@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { claimFirstAdmin, resolveLoginEmail } from "@/lib/auth.functions";
+import { resolveLoginEmail } from "@/lib/auth.functions";
 import { Toaster } from "@/components/ui/sonner";
 
 const searchSchema = z.object({
