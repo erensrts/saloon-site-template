@@ -101,7 +101,9 @@ export const tr = {
       slots: "Boş Zaman Dilimleri",
       gallery: "Galeri",
       content: "Site İçeriği",
+      users: "Kullanıcılar",
     },
+
     common: {
       save: "Kaydet",
       saving: "Kaydediliyor…",
@@ -321,8 +323,48 @@ export const tr = {
       },
       imagePreviewAlt: "Önizleme",
     },
+    users: {
+      title: "Kullanıcılar",
+      subtitle:
+        "Admin panelinde oturum açabilecek kişileri yönetin. Yeni admin davet edin, rol verin veya hesap silin.",
+      refresh: "Yenile",
+      invite: "Admin davet et",
+      inviteTitle: "Yeni admin davet et",
+      inviteDesc:
+        "Girilen e-postaya davet linki gönderilir. Kullanıcı kaydolduğunda otomatik olarak admin rolüne yükseltilir.",
+      emailLabel: "E-posta",
+      sendInvite: "Daveti gönder",
+      you: "Siz",
+      pending: "Davet bekleniyor",
+      roleAdmin: "Admin",
+      roleUser: "Kullanıcı",
+      makeAdmin: "Admin yap",
+      removeAdmin: "Admin rolünü kaldır",
+      columns: {
+        email: "E-posta",
+        role: "Rol",
+        created: "Kayıt",
+        lastSignIn: "Son giriş",
+        actions: "İşlemler",
+      },
+      confirmDelete: "Bu kullanıcıyı kalıcı olarak silmek istiyor musunuz?",
+      confirmCancelInvite: "Bu daveti iptal etmek istiyor musunuz?",
+      toastInviteSent: "Davet gönderildi",
+      toastInviteCancelled: "Davet iptal edildi",
+      toastPromoted: "Kullanıcı admin yapıldı",
+      toastRoleUpdated: "Rol güncellendi",
+      toastDeleted: "Kullanıcı silindi",
+      errors: {
+        selfDelete: "Kendi hesabınızı silemezsiniz.",
+        selfRoleChange: "Kendi admin rolünüzü kaldıramazsınız.",
+        lastAdmin:
+          "Sistemdeki son admin — önce başka bir kullanıcıyı admin yapın.",
+        forbidden: "Bu işlem için yetkiniz yok.",
+      },
+    },
   },
 };
+
 
 
 
