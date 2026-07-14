@@ -8,33 +8,34 @@
  * helper was moved to the private schema (no longer exposed via the
  * Data API).
  */
-export async function assertAdmin(context: {
-  supabase: {
-    from: (t: "user_roles") => {
-      select: (cols: string) => {
-        eq: (
-          col: string,
-          val: string,
-        ) => {
+export async function assertAdmin(context: unknown): Promise<void> {
+  const ctx = context as {
+    supabase: {
+      from: (t: string) => {
+        select: (cols: string) => {
           eq: (
             col: string,
             val: string,
           ) => {
-            maybeSingle: () => PromiseLike<{
-              data: { id: string } | null;
-              error: unknown;
-            }>;
+            eq: (
+              col: string,
+              val: string,
+            ) => {
+              maybeSingle: () => Promise<{
+                data: { id: string } | null;
+                error: unknown;
+              }>;
+            };
           };
         };
       };
     };
+    userId: string;
   };
-  userId: string;
-}): Promise<void> {
-  const { data, error } = await context.supabase
+  const { data, error } = await ctx.supabase
     .from("user_roles")
     .select("id")
-    .eq("user_id", context.userId)
+    .eq("user_id", ctx.userId)
     .eq("role", "admin")
     .maybeSingle();
   if (error) throw error;
