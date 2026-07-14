@@ -176,9 +176,11 @@ function AdminPage() {
             <TabsContent value="content" className="mt-0">
               <ContentTab />
             </TabsContent>
-            <TabsContent value="users" className="mt-0">
-              <UsersTab />
-            </TabsContent>
+            {isAdmin && (
+              <TabsContent value="users" className="mt-0">
+                <UsersTab />
+              </TabsContent>
+            )}
 
             {placeholderTabs.map((tab) => (
               <TabsContent key={tab.value} value={tab.value} className="mt-0">
