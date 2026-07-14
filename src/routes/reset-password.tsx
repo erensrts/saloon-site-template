@@ -116,7 +116,6 @@ function ResetPasswordPage() {
               <input
                 type="password"
                 required
-                minLength={6}
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 autoComplete="new-password"
