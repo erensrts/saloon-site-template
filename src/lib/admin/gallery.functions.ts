@@ -38,9 +38,11 @@ const COLS =
 export const adminListGallery = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => listSchema.parse(data ?? {}))
-  .handler(async ({ data, context }): Promise<GalleryRow[]> => {
-    await assertAdmin(context);
-    const { data: rows, error } = await context.supabase
+  .handler(async ({ data }): Promise<GalleryRow[]> => {
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data: rows, error } = await supabaseAdmin
       .from("gallery_images")
       .select(COLS)
       .eq("language", data.language)

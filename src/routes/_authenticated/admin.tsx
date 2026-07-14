@@ -142,9 +142,11 @@ function AdminPage() {
             <TabsTrigger value="content" className="rounded-xl">
               {ta.tabs.content}
             </TabsTrigger>
-            <TabsTrigger value="users" className="rounded-xl">
-              {ta.tabs.users}
-            </TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger value="users" className="rounded-xl">
+                {ta.tabs.users}
+              </TabsTrigger>
+            )}
             {placeholderTabs.map((tab) => (
               <TabsTrigger key={tab.value} value={tab.value} className="rounded-xl">
                 {tab.label}
@@ -174,9 +176,11 @@ function AdminPage() {
             <TabsContent value="content" className="mt-0">
               <ContentTab />
             </TabsContent>
-            <TabsContent value="users" className="mt-0">
-              <UsersTab />
-            </TabsContent>
+            {isAdmin && (
+              <TabsContent value="users" className="mt-0">
+                <UsersTab />
+              </TabsContent>
+            )}
 
             {placeholderTabs.map((tab) => (
               <TabsContent key={tab.value} value={tab.value} className="mt-0">

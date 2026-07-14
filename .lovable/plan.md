@@ -1,49 +1,48 @@
-# Kullanıcı Adı ile Kayıt & Giriş
+# Salt-okunur Admin Paneli — Veri Görüntüleme Düzeltmesi
 
-## Amaç
-- Kayıtta e-posta yanında **kullanıcı adı** alanı zorunlu olacak.
-- Girişte kullanıcı; **kullanıcı adı VEYA e-posta** ile giriş yapabilecek.
-- Şifre için hiçbir uzunluk / karmaşıklık kısıtlaması olmayacak.
+## Sorun
+Admin paneli, giriş yapmış ancak admin rolü olmayan kullanıcılar için "salt-okunur mod" olarak açılıyor, ancak sekmelerin her biri hata veriyor ve içerik gösterilmiyor. Sebep:
 
-## Yapılacaklar
+- Tüm `adminList*` server fonksiyonları `assertAdmin(context)` çağırıyor → admin olmayan kullanıcıda `Forbidden` fırlatılıyor.
+- Ayrıca tabloların RLS politikaları da yalnızca admin'e SELECT izni veriyor — RLS geçilse bile boş dönerdi.
 
-### 1) Veritabanı — `profiles` tablosu (migration)
-- `public.profiles` tablosu: `id (uuid, PK, FK → auth.users on delete cascade)`, `username (citext, unique, not null)`, `created_at`, `updated_at`.
-- GRANT + RLS: herkes (`anon`+`authenticated`) yalnızca `SELECT` yapabilir (username → email çözümü için gerekli, ama sadece kullanıcı adının varlığını doğrular; e-posta profilde tutulmuyor). Kendi profilini `UPDATE` edebilir.
-- Trigger: `auth.users` üzerinde AFTER INSERT → yeni kaydın `raw_user_meta_data->>'username'` değerini `profiles`'a yazar. Kullanıcı adı boşsa (ör. davet akışı) e-postanın `@` öncesini kullanır; çakışırsa sonuna kısa random ek koyar.
-- `private` şemasında `resolve_email_by_username(text) returns text` fonksiyonu (SECURITY DEFINER) — `profiles` + `auth.users` join'ler, e-postayı döner.
+## Yaklaşım
+Okuma (list) fonksiyonlarında admin kısıtını kaldır; yazma (insert/update/delete/toggle/upsert/invite/setRole/deleteUser/cancelInvite) fonksiyonlarında `assertAdmin` aynen kalsın. Böylece yetkisiz düzenleme sunucu tarafından da engellenmiş olur — UI'daki `fieldset disabled` sadece görsel bir katman.
 
-### 2) Backend — server function
-- `src/lib/auth.functions.ts` içine `resolveLoginEmail({ identifier })` eklenecek:
-  - Girdi `@` içeriyorsa aynen döner.
-  - Aksi halde `supabaseAdmin.rpc('resolve_email_by_username', ...)` çağırıp e-postayı döner.
-  - Bulunamazsa hata (`Kullanıcı adı bulunamadı`).
-- Public serverFn — kimlik doğrulama gerektirmez, yalnızca username→email çevirir.
+Okuma sırasında RLS admin'e kilitli olduğundan, list handler'ları `context.supabase` yerine `supabaseAdmin` istemcisini kullanacak. Bu güvenli, çünkü endpoint zaten `requireSupabaseAuth` ile korunuyor (yalnızca giriş yapmış kullanıcı).
 
-### 3) Frontend — `src/routes/auth.tsx`
-- **Kayıt (signup):** yeni **Kullanıcı adı** alanı (2–30 karakter, `[a-zA-Z0-9_.]`), `supabase.auth.signUp` çağrısına `options.data.username` eklenecek. Çakışma hatası kullanıcı dostu mesajla gösterilecek.
-- **Giriş (signin):** "E-posta" alanı **"E-posta veya Kullanıcı adı"** olarak değiştirilecek; submit'te önce `resolveLoginEmail` çağrılıp dönen e-posta ile `signInWithPassword` yapılacak.
-- **Şifre alanları:** `minLength={6}` ve `required` dışındaki tüm kısıtlar kaldırılacak (boş olmayacak, uzunluk şartı yok).
+## Dosya Bazlı Değişiklikler
 
-### 4) Diğer şifre girişleri
-- `src/components/admin/ChangePasswordDialog.tsx` ve `src/routes/reset-password.tsx`: `minLength={6}` kaldırılacak, "en az 6 karakter" kontrolleri ve mesajları silinecek. "Yeni şifre eskisiyle aynı olamaz" kontrolü kalabilir.
+**`src/lib/admin/appointments.functions.ts`**
+- `adminListAppointments`: `assertAdmin` çağrısı kaldırılır. Sorgu `supabaseAdmin` üzerinden yapılır.
+- `adminUpdateAppointmentStatus`, `adminDeleteAppointment`: değişmez (admin gerekli).
 
-### 5) i18n
-- `tr.ts` ve `en.ts` içine yeni etiketler: `usernameLabel`, `identifierLabel` ("E-posta veya kullanıcı adı"), doğrulama mesajları (`usernameInvalid`, `usernameTaken`, `identifierNotFound`).
+**`src/lib/admin/services.functions.ts`**
+- `adminListServices`: `assertAdmin` kaldırılır, `supabaseAdmin` kullanır.
+- Upsert/toggle/delete: değişmez.
 
-## Önemli Not — Şifre Minimum Uzunluk
-Supabase Auth backend'i **varsayılan olarak 6 karakter minimum şifre uzunluğu** uygular ve bu proje için mevcut yönetim aracıyla değiştirilemiyor. İstemci tarafındaki tüm kısıtları kaldıracağız; ancak backend 6'dan kısa şifreyi reddederse Supabase'in orijinal hata mesajı toast olarak gösterilecek. Bu limiti tamamen kaldırmak için Supabase Auth ayarlarının manuel değiştirilmesi gerekir.
+**`src/lib/admin/gallery.functions.ts`**
+- `adminListGallery`: `assertAdmin` kaldırılır, `supabaseAdmin` kullanır.
+- Upsert/toggle/delete: değişmez.
 
-## Teknik Ayrıntılar
-- `profiles.username` için `citext` uzantısı kullanılır → case-insensitive unique.
-- Trigger `handle_new_user_admin_invite` ile çakışmaz; ayrı `AFTER INSERT` trigger olarak eklenecek.
-- Mevcut kullanıcılar için migration içinde geriye dönük `profiles` doldurma yapılacak (`email` local-part + gerekiyorsa suffix).
-- `resolve_email_by_username` `private` şemasında olduğu için PostgREST'e sızmaz; sadece server-side kullanılır.
+**`src/lib/admin/slots.functions.ts`, `working-hours.functions.ts`, `site-content.functions.ts`**
+- Her dosyada yalnızca `adminList*` benzeri okuma fonksiyonu, aynı şekilde `assertAdmin` kaldırılıp `supabaseAdmin` ile okuma.
+- Diğer mutasyon fonksiyonları değişmez.
+
+**`src/lib/admin/users.functions.ts`** (Kullanıcılar sekmesi)
+- Bu tablo hassas: tüm kullanıcıların e-postaları, admin rolü listesi ve davetler. Salt-okunur görüntüleyicilere açmak gereksiz risk.
+- `adminListUsers` ve tüm diğer fonksiyonlar `assertAdmin`'de kalır (değişmez).
+
+**`src/routes/_authenticated/admin.tsx`**
+- `Users` sekmesi (`TabsTrigger` + `TabsContent`) yalnızca `isAdmin` iken render edilecek.
+- Non-admin ilk yüklemede varsayılan sekme (`appointments`) açık kalır ve içerik görünür olur.
+
+## Neden Böyle Güvenli
+- Kayıt / güncelleme / silme uçları hâlâ `assertAdmin` ile korunuyor — admin olmayan bir kullanıcı, UI'daki disabled durumunu bypass etse bile server yazma işlemini reddeder.
+- Okuma uçları yine `requireSupabaseAuth` ile korunuyor — genel internete açık değil, yalnızca giriş yapmış kullanıcılar erişebilir.
+- Users sekmesi hassas olduğu için tamamen admin'e özel kalır.
 
 ## Test Senaryoları
-1. Yeni kayıt: kullanıcı adı + e-posta + şifre → profil oluşur, giriş her ikisiyle de çalışır.
-2. Aynı kullanıcı adıyla ikinci kayıt → hata.
-3. Kullanıcı adıyla giriş → başarılı.
-4. E-posta ile giriş → başarılı.
-5. Var olmayan kullanıcı adı ile giriş → "Kullanıcı adı bulunamadı".
-6. Şifre alanına 3 karakter → istemci engellemez (backend cevabına göre davranır).
+1. Admin girişi: tüm sekmeler eskisi gibi çalışır, düzenleme yapılabilir.
+2. Non-admin girişi: Randevular / Hizmetler / Saatler / Slotlar / Galeri / İçerik sekmelerinde veriler listelenir; butonlar disabled görünür; Kullanıcılar sekmesi görünmez.
+3. Non-admin biri UI dışından mutasyon endpoint'ini çağırırsa → `Forbidden` hatası alır.

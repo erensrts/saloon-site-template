@@ -24,9 +24,11 @@ const listSchema = z.object({
 export const adminListSlots = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => listSchema.parse(data))
-  .handler(async ({ data, context }): Promise<SlotRow[]> => {
-    await assertAdmin(context);
-    const { data: rows, error } = await context.supabase
+  .handler(async ({ data }): Promise<SlotRow[]> => {
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data: rows, error } = await supabaseAdmin
       .from("availability_slots")
       .select("id,date,time,is_booked,appointment_id,created_at,updated_at")
       .gte("date", data.from)
