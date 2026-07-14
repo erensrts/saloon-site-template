@@ -63,15 +63,12 @@ function AdminPage() {
     );
   }
 
-  if (isError || !data?.isAdmin) {
+  if (isError) {
     return (
       <div className="min-h-screen bg-secondary/40 flex items-center justify-center px-4">
         <div className="max-w-md rounded-2xl bg-card border border-border/60 p-8 text-center">
           <ShieldAlert className="text-primary mx-auto mb-4" size={40} />
-          <h1 className="font-display text-2xl mb-2">Yetkisiz Erişim</h1>
-          <p className="text-sm text-muted-foreground mb-6">
-            Bu hesabın admin rolü yok. Bir admin size rol atadıktan sonra tekrar deneyin.
-          </p>
+          <h1 className="font-display text-2xl mb-2">Bir hata oluştu</h1>
           <button
             onClick={handleSignOut}
             className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition"
@@ -83,6 +80,8 @@ function AdminPage() {
       </div>
     );
   }
+
+  const isAdmin = Boolean(data?.isAdmin);
 
   const placeholderTabs: { value: string; label: string }[] = [];
 
