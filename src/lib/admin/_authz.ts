@@ -8,36 +8,15 @@
  * helper was moved to the private schema (no longer exposed via the
  * Data API).
  */
-export async function assertAdmin(context: unknown): Promise<void> {
-  const ctx = context as {
-    supabase: {
-      from: (t: string) => {
-        select: (cols: string) => {
-          eq: (
-            col: string,
-            val: string,
-          ) => {
-            eq: (
-              col: string,
-              val: string,
-            ) => {
-              maybeSingle: () => Promise<{
-                data: { id: string } | null;
-                error: unknown;
-              }>;
-            };
-          };
-        };
-      };
-    };
-    userId: string;
-  };
-  const { data, error } = await ctx.supabase
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function assertAdmin(context: any): Promise<void> {
+  const { data, error } = await context.supabase
     .from("user_roles")
     .select("id")
-    .eq("user_id", ctx.userId)
+    .eq("user_id", context.userId)
     .eq("role", "admin")
     .maybeSingle();
   if (error) throw error;
   if (!data) throw new Error("Forbidden");
 }
+
