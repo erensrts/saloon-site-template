@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { claimFirstAdmin, resolveLoginEmail } from "@/lib/auth.functions";
+import { resolveLoginEmail } from "@/lib/auth.functions";
 import { Toaster } from "@/components/ui/sonner";
 
 const searchSchema = z.object({
@@ -93,19 +93,10 @@ function AuthPage() {
 
         const { data: sess } = await supabase.auth.getSession();
         if (sess.session) {
-          try {
-            const res = await claimFirstAdmin();
-            if (res.claimed) {
-              toast.success("Hesap oluşturuldu — ilk admin olarak atandınız.");
-            } else {
-              toast.success("Hesap oluşturuldu. Bir admin size rol atayana kadar panel kısıtlı olacak.");
-            }
-          } catch {
-            toast.success("Hesap oluşturuldu.");
-          }
+          toast.success("Hesap oluşturuldu.");
           goToAdmin();
         } else {
-          toast.success("Doğrulama e-postası gönderildi. Onayladıktan sonra giriş yapın.");
+          toast.success("Hesap oluşturuldu. Şimdi giriş yapabilirsiniz.");
           setMode("signin");
         }
       } else {
@@ -263,7 +254,7 @@ function AuthPage() {
 
         {mode === "signup" && (
           <p className="mt-4 text-xs text-muted-foreground text-center">
-            Kayıt olan <strong>ilk kullanıcı</strong> otomatik olarak admin olur.
+            Yeni hesaplar salt-okunur olarak açılır. Admin, panelden rol atayarak düzenleme yetkisi verebilir.
           </p>
         )}
       </div>

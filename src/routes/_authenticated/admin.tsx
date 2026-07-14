@@ -63,15 +63,12 @@ function AdminPage() {
     );
   }
 
-  if (isError || !data?.isAdmin) {
+  if (isError) {
     return (
       <div className="min-h-screen bg-secondary/40 flex items-center justify-center px-4">
         <div className="max-w-md rounded-2xl bg-card border border-border/60 p-8 text-center">
           <ShieldAlert className="text-primary mx-auto mb-4" size={40} />
-          <h1 className="font-display text-2xl mb-2">Yetkisiz Erişim</h1>
-          <p className="text-sm text-muted-foreground mb-6">
-            Bu hesabın admin rolü yok. Bir admin size rol atadıktan sonra tekrar deneyin.
-          </p>
+          <h1 className="font-display text-2xl mb-2">Bir hata oluştu</h1>
           <button
             onClick={handleSignOut}
             className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition"
@@ -83,6 +80,8 @@ function AdminPage() {
       </div>
     );
   }
+
+  const isAdmin = Boolean(data?.isAdmin);
 
   const placeholderTabs: { value: string; label: string }[] = [];
 
@@ -115,6 +114,14 @@ function AdminPage() {
       </header>
 
       <main className="container-narrow py-8 md:py-10">
+        {!isAdmin && (
+          <div className="mb-6 rounded-2xl border border-amber-300/60 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 text-sm text-amber-900 dark:text-amber-200 flex items-center gap-2">
+            <ShieldAlert size={16} />
+            <span>
+              Salt-okunur görüntüleme modu. Değişiklik yapabilmek için admin rolüne ihtiyacınız var.
+            </span>
+          </div>
+        )}
         <Tabs defaultValue="appointments" className="w-full">
           <TabsList className="w-full flex-wrap h-auto justify-start gap-1 bg-card border border-border/60 p-1 rounded-2xl mb-6">
             <TabsTrigger value="appointments" className="rounded-xl">
@@ -138,59 +145,48 @@ function AdminPage() {
             <TabsTrigger value="users" className="rounded-xl">
               {ta.tabs.users}
             </TabsTrigger>
-
-
             {placeholderTabs.map((tab) => (
               <TabsTrigger key={tab.value} value={tab.value} className="rounded-xl">
                 {tab.label}
               </TabsTrigger>
             ))}
-
           </TabsList>
 
-          <TabsContent value="appointments" className="mt-0">
-            <AppointmentsTab />
-          </TabsContent>
-
-          <TabsContent value="services" className="mt-0">
-            <ServicesTab />
-          </TabsContent>
-
-
-          <TabsContent value="hours" className="mt-0">
-            <WorkingHoursTab />
-          </TabsContent>
-
-          <TabsContent value="slots" className="mt-0">
-            <SlotsTab />
-          </TabsContent>
-
-          <TabsContent value="gallery" className="mt-0">
-            <GalleryTab />
-          </TabsContent>
-
-          <TabsContent value="content" className="mt-0">
-            <ContentTab />
-          </TabsContent>
-
-          <TabsContent value="users" className="mt-0">
-            <UsersTab />
-          </TabsContent>
-
-
-
-
-
-
-
-          {placeholderTabs.map((tab) => (
-            <TabsContent key={tab.value} value={tab.value} className="mt-0">
-              <div className="rounded-2xl bg-card border border-dashed border-border/70 p-10 text-center text-muted-foreground">
-                <p className="font-display text-xl mb-1">{tab.label}</p>
-                <p className="text-sm">{ta.common.soon}</p>
-              </div>
+          <fieldset
+            disabled={!isAdmin}
+            className={!isAdmin ? "min-w-0 opacity-95" : "min-w-0"}
+          >
+            <TabsContent value="appointments" className="mt-0">
+              <AppointmentsTab />
             </TabsContent>
-          ))}
+            <TabsContent value="services" className="mt-0">
+              <ServicesTab />
+            </TabsContent>
+            <TabsContent value="hours" className="mt-0">
+              <WorkingHoursTab />
+            </TabsContent>
+            <TabsContent value="slots" className="mt-0">
+              <SlotsTab />
+            </TabsContent>
+            <TabsContent value="gallery" className="mt-0">
+              <GalleryTab />
+            </TabsContent>
+            <TabsContent value="content" className="mt-0">
+              <ContentTab />
+            </TabsContent>
+            <TabsContent value="users" className="mt-0">
+              <UsersTab />
+            </TabsContent>
+
+            {placeholderTabs.map((tab) => (
+              <TabsContent key={tab.value} value={tab.value} className="mt-0">
+                <div className="rounded-2xl bg-card border border-dashed border-border/70 p-10 text-center text-muted-foreground">
+                  <p className="font-display text-xl mb-1">{tab.label}</p>
+                  <p className="text-sm">{ta.common.soon}</p>
+                </div>
+              </TabsContent>
+            ))}
+          </fieldset>
         </Tabs>
       </main>
       <Toaster position="top-center" richColors />
