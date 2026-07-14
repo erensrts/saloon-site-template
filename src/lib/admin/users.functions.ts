@@ -36,26 +36,28 @@ async function assertAdmin(context: {
   if (!isAdmin) throw new Error("Forbidden");
 }
 
-async function countAdmins(supabase: {
-  from: (t: "user_roles") => {
-    select: (
-      cols: string,
-      opts: { count: "exact"; head: true },
-    ) => {
-      eq: (
-        col: "role",
-        val: "admin",
-      ) => PromiseLike<{ count: number | null; error: unknown }>;
+async function countAdmins(supabase: unknown): Promise<number> {
+  const sb = supabase as {
+    from: (t: string) => {
+      select: (
+        cols: string,
+        opts: { count: "exact"; head: true },
+      ) => {
+        eq: (
+          col: string,
+          val: string,
+        ) => Promise<{ count: number | null; error: unknown }>;
+      };
     };
   };
-}): Promise<number> {
-  const { count, error } = await supabase
+  const { count, error } = await sb
     .from("user_roles")
     .select("id", { count: "exact", head: true })
     .eq("role", "admin");
   if (error) throw error;
   return count ?? 0;
 }
+
 
 export const adminListUsers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
