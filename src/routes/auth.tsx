@@ -254,7 +254,7 @@ function AuthPage() {
 
         {mode === "signup" && (
           <p className="mt-4 text-xs text-muted-foreground text-center">
-            Kayıt olan <strong>ilk kullanıcı</strong> otomatik olarak admin olur.
+            Yeni hesaplar salt-okunur olarak açılır. Admin, panelden rol atayarak düzenleme yetkisi verebilir.
           </p>
         )}
       </div>
