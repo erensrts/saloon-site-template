@@ -1,39 +1,49 @@
-# Admin Kullanıcı Yönetimi
+# Kullanıcı Adı ile Kayıt & Giriş
 
-Admin paneline yeni bir **"Kullanıcılar"** sekmesi eklenir. Silme, rol yönetimi ve yeni admin davet etme özelliklerini içerir.
+## Amaç
+- Kayıtta e-posta yanında **kullanıcı adı** alanı zorunlu olacak.
+- Girişte kullanıcı; **kullanıcı adı VEYA e-posta** ile giriş yapabilecek.
+- Şifre için hiçbir uzunluk / karmaşıklık kısıtlaması olmayacak.
 
-## Özellikler
+## Yapılacaklar
 
-**Liste:** Tüm kullanıcılar tabloda gösterilir — e-posta, kayıt tarihi, son giriş, rol rozeti (admin / kullanıcı).
+### 1) Veritabanı — `profiles` tablosu (migration)
+- `public.profiles` tablosu: `id (uuid, PK, FK → auth.users on delete cascade)`, `username (citext, unique, not null)`, `created_at`, `updated_at`.
+- GRANT + RLS: herkes (`anon`+`authenticated`) yalnızca `SELECT` yapabilir (username → email çözümü için gerekli, ama sadece kullanıcı adının varlığını doğrular; e-posta profilde tutulmuyor). Kendi profilini `UPDATE` edebilir.
+- Trigger: `auth.users` üzerinde AFTER INSERT → yeni kaydın `raw_user_meta_data->>'username'` değerini `profiles`'a yazar. Kullanıcı adı boşsa (ör. davet akışı) e-postanın `@` öncesini kullanır; çakışırsa sonuna kısa random ek koyar.
+- `private` şemasında `resolve_email_by_username(text) returns text` fonksiyonu (SECURITY DEFINER) — `profiles` + `auth.users` join'ler, e-postayı döner.
 
-**Rol yönetimi:** Her satırda "Admin yap" / "Admin rolünü kaldır" butonu. `user_roles` tablosuna insert/delete.
+### 2) Backend — server function
+- `src/lib/auth.functions.ts` içine `resolveLoginEmail({ identifier })` eklenecek:
+  - Girdi `@` içeriyorsa aynen döner.
+  - Aksi halde `supabaseAdmin.rpc('resolve_email_by_username', ...)` çağırıp e-postayı döner.
+  - Bulunamazsa hata (`Kullanıcı adı bulunamadı`).
+- Public serverFn — kimlik doğrulama gerektirmez, yalnızca username→email çevirir.
 
-**Davet:** Üstte "Yeni admin davet et" butonu → e-posta girilir → Supabase Auth Admin API ile davet gönderilir (Lovable varsayılan e-postası) → kullanıcı kaydolduğunda otomatik admin rolü verilir.
+### 3) Frontend — `src/routes/auth.tsx`
+- **Kayıt (signup):** yeni **Kullanıcı adı** alanı (2–30 karakter, `[a-zA-Z0-9_.]`), `supabase.auth.signUp` çağrısına `options.data.username` eklenecek. Çakışma hatası kullanıcı dostu mesajla gösterilecek.
+- **Giriş (signin):** "E-posta" alanı **"E-posta veya Kullanıcı adı"** olarak değiştirilecek; submit'te önce `resolveLoginEmail` çağrılıp dönen e-posta ile `signInWithPassword` yapılacak.
+- **Şifre alanları:** `minLength={6}` ve `required` dışındaki tüm kısıtlar kaldırılacak (boş olmayacak, uzunluk şartı yok).
 
-**Silme:** Her satırda çöp kutusu ikonu → onay diyaloğu → kullanıcı `auth.users`'tan tamamen silinir (cascade ile `user_roles` da temizlenir).
+### 4) Diğer şifre girişleri
+- `src/components/admin/ChangePasswordDialog.tsx` ve `src/routes/reset-password.tsx`: `minLength={6}` kaldırılacak, "en az 6 karakter" kontrolleri ve mesajları silinecek. "Yeni şifre eskisiyle aynı olamaz" kontrolü kalabilir.
 
-## Güvenlik Kuralları
+### 5) i18n
+- `tr.ts` ve `en.ts` içine yeni etiketler: `usernameLabel`, `identifierLabel` ("E-posta veya kullanıcı adı"), doğrulama mesajları (`usernameInvalid`, `usernameTaken`, `identifierNotFound`).
 
-- Tüm işlemler `createServerFn` + `requireSupabaseAuth` + `has_role(admin)` kontrolünden geçer.
-- **Kendini silme engellenir:** server fn `context.userId === targetId` ise hata döner.
-- **Son admin koruması:** silinen/rolü alınan kullanıcı sistemdeki tek admin ise işlem reddedilir (admin kilitlenmesini önler).
-- Auth Admin API çağrıları için `supabaseAdmin` handler içinde `await import(...)` ile yüklenir (module scope'ta değil).
+## Önemli Not — Şifre Minimum Uzunluk
+Supabase Auth backend'i **varsayılan olarak 6 karakter minimum şifre uzunluğu** uygular ve bu proje için mevcut yönetim aracıyla değiştirilemiyor. İstemci tarafındaki tüm kısıtları kaldıracağız; ancak backend 6'dan kısa şifreyi reddederse Supabase'in orijinal hata mesajı toast olarak gösterilecek. Bu limiti tamamen kaldırmak için Supabase Auth ayarlarının manuel değiştirilmesi gerekir.
 
-## Teknik Detaylar
+## Teknik Ayrıntılar
+- `profiles.username` için `citext` uzantısı kullanılır → case-insensitive unique.
+- Trigger `handle_new_user_admin_invite` ile çakışmaz; ayrı `AFTER INSERT` trigger olarak eklenecek.
+- Mevcut kullanıcılar için migration içinde geriye dönük `profiles` doldurma yapılacak (`email` local-part + gerekiyorsa suffix).
+- `resolve_email_by_username` `private` şemasında olduğu için PostgREST'e sızmaz; sadece server-side kullanılır.
 
-**Yeni dosyalar:**
-- `src/lib/admin/users.functions.ts` — `adminListUsers`, `adminInviteAdmin`, `adminSetRole`, `adminDeleteUser` server fn'leri. Listeleme `supabaseAdmin.auth.admin.listUsers()` + `user_roles` join. Davet `supabaseAdmin.auth.admin.inviteUserByEmail(email, { data: { pending_role: 'admin' } })` + davet edilen e-postayı bir `pending_admin_invites` tablosuna kaydeder.
-- `src/components/admin/UsersTab.tsx` — tablo, davet dialog'u, rol butonları, silme onay diyaloğu (mevcut `AppointmentsTab` deseniyle aynı: React Query + `useServerFn` + `sonner` toast + `AlertDialog`).
-- Migration: `pending_admin_invites` tablosu (email, invited_by, created_at) + RLS (sadece admin okur/yazar) + `handle_new_user` trigger'ı: yeni kayıt olan kullanıcının e-postası `pending_admin_invites`'ta varsa otomatik `user_roles`'a admin ekle ve daveti sil.
-
-**Değişecek dosyalar:**
-- `src/routes/_authenticated/admin.tsx` — yeni "Kullanıcılar" sekmesi eklenir.
-- `src/i18n/tr.ts` ve `src/i18n/en.ts` — `admin.users` altında etiketler (title, subtitle, invite, delete, makeAdmin, removeAdmin, confirmDelete, kendini silme hatası, son admin hatası, vb.).
-
-## Test
-
-1. Yeni bir e-postayı davet et → e-posta gelir → kaydol → otomatik admin olarak listelenir.
-2. Başka bir admine "Admin rolünü kaldır" → rozet "kullanıcı"ya döner.
-3. Kendi hesabını sil/rolünü kaldır → hata toast'ı görünür, işlem yapılmaz.
-4. Tek admin kalınca rol kaldırmayı dene → engellenir.
-5. Kullanıcıyı sil → auth'tan kaybolur, tekrar aynı e-postayla kaydolabilir.
+## Test Senaryoları
+1. Yeni kayıt: kullanıcı adı + e-posta + şifre → profil oluşur, giriş her ikisiyle de çalışır.
+2. Aynı kullanıcı adıyla ikinci kayıt → hata.
+3. Kullanıcı adıyla giriş → başarılı.
+4. E-posta ile giriş → başarılı.
+5. Var olmayan kullanıcı adı ile giriş → "Kullanıcı adı bulunamadı".
+6. Şifre alanına 3 karakter → istemci engellemez (backend cevabına göre davranır).

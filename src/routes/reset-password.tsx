@@ -52,8 +52,8 @@ function ResetPasswordPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (busy) return;
-    if (password.length < 6) {
-      toast.error("Şifre en az 6 karakter olmalı");
+    if (!password) {
+      toast.error("Şifre gerekli");
       return;
     }
     if (password !== confirm) {
@@ -105,7 +105,6 @@ function ResetPasswordPage() {
               <input
                 type="password"
                 required
-                minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"
@@ -117,7 +116,6 @@ function ResetPasswordPage() {
               <input
                 type="password"
                 required
-                minLength={6}
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 autoComplete="new-password"

@@ -36,8 +36,8 @@ export function ChangePasswordDialog({ email }: Props) {
       toast.error("Kullanıcı bulunamadı");
       return;
     }
-    if (next.length < 6) {
-      toast.error("Yeni şifre en az 6 karakter olmalı");
+    if (!next) {
+      toast.error("Yeni şifre gerekli");
       return;
     }
     if (next !== confirm) {
@@ -103,7 +103,6 @@ export function ChangePasswordDialog({ email }: Props) {
             <input
               type="password"
               required
-              minLength={6}
               value={current}
               onChange={(e) => setCurrent(e.target.value)}
               autoComplete="current-password"
@@ -115,7 +114,6 @@ export function ChangePasswordDialog({ email }: Props) {
             <input
               type="password"
               required
-              minLength={6}
               value={next}
               onChange={(e) => setNext(e.target.value)}
               autoComplete="new-password"
@@ -127,7 +125,6 @@ export function ChangePasswordDialog({ email }: Props) {
             <input
               type="password"
               required
-              minLength={6}
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               autoComplete="new-password"
