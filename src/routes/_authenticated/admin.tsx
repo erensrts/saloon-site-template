@@ -173,6 +173,11 @@ function AdminPage() {
             <ContentTab />
           </TabsContent>
 
+          <TabsContent value="users" className="mt-0">
+            <UsersTab />
+          </TabsContent>
+
+
 
 
 
