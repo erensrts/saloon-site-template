@@ -13,6 +13,7 @@ import { SlotsTab } from "@/components/admin/SlotsTab";
 import { GalleryTab } from "@/components/admin/GalleryTab";
 import { AppointmentsTab } from "@/components/admin/AppointmentsTab";
 import { ContentTab } from "@/components/admin/ContentTab";
+import { ChangePasswordDialog } from "@/components/admin/ChangePasswordDialog";
 
 
 
@@ -100,6 +101,7 @@ function AdminPage() {
             {email && (
               <span className="text-muted-foreground hidden sm:inline">{email}</span>
             )}
+            <ChangePasswordDialog email={email} />
             <button
               onClick={handleSignOut}
               className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 hover:bg-accent transition"

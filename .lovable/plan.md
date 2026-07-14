@@ -1,49 +1,41 @@
-# Plan: DB-Destekli, Admin Panelli, Çok Dilli Salon Şablonu (Onaylandı)
+## Amaç
+Admin kullanıcıları için şifre sıfırlama ve şifre değiştirme akışı eklemek. E-postalar Lovable'ın varsayılan gönderim altyapısı üzerinden gidecek (ek DNS/domain kurulumu yok).
 
-## Netleşen Kararlar
-1. **Profiles tablosu YOK** — sadece `auth.users` + `user_roles` + `has_role()`.
-2. **Slotlar toplu üretilir** — admin çalışma saati + aralık girer, sistem `availability_slots`'u otomatik doldurur.
+## Akış Özeti
 
-## Uygulama Sırası (6 Faz — her faz sonunda test için durulur)
+**1. /auth sayfasında "Şifremi unuttum"**
+- Giriş formunun altına link.
+- Tıklanınca aynı sayfada e-posta iste → `supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + "/reset-password" })`.
+- Toast: "Sıfırlama bağlantısı e-postanıza gönderildi."
 
-### Faz 1 — i18n İskeleti (SIRADAKİ)
-- `src/i18n/tr.ts`, `src/i18n/en.ts` sözlükleri (nav, form etiketleri, toast'lar, gelecekteki admin UI stringleri).
-- `src/i18n/index.ts` → `t(key)` helper, `siteConfig.locale` okur.
-- `site.config.ts`'e `locale: "tr"` alanı.
-- Public bileşenlerdeki sabit TR stringleri `t(...)`'a taşınır. Görsel çıktı birebir aynı.
-- `<html lang>` ve `head` meta locale'e bağlanır.
-- **Risk:** Düşük. **Test:** Site aynı görünmeli; `locale` "en" yapıldığında UI İngilizce görünmeli.
+**2. Yeni public route: `/reset-password`**
+- SSR kapalı, `noindex, nofollow`.
+- Supabase, e-postadaki linkle geldiğinde `PASSWORD_RECOVERY` event'ini tetikler ve geçici oturum açar. Sayfa `onAuthStateChange` ile bu event'i dinler; geçerli recovery oturumu yoksa uyarı gösterir ("Bağlantı geçersiz veya süresi dolmuş").
+- İki alan: Yeni şifre + Tekrar. En az 6 karakter, eşleşme kontrolü.
+- Submit → `supabase.auth.updateUser({ password })` → başarı → `signOut()` + `/auth`'a yönlendirme + toast.
 
-### Faz 2 — Lovable Cloud + Şema + Public Okuma
-- Cloud aktif, migration'lar: `services`, `gallery_images`, `working_hours`, `availability_slots`, `site_content`, `appointments`, `user_roles` — hepsinde `language text not null default 'tr'`, GRANT'ler, RLS, `has_role()`.
-- Seed migration: bugünkü `site.config.ts` içeriği `tr` locale ile eklenir.
-- Public bileşenler publishable-key server fn'lerle veri çeker; DB hatası → config fallback.
-- **Test:** Site DB'den okuyor mu, DB'yi bozunca fallback devreye giriyor mu.
+**3. Admin panelinde "Şifremi değiştir"**
+- `src/routes/_authenticated/admin.tsx` içinde, mevcut "Çıkış yap" butonunun yanına küçük bir bölüm/dialog.
+- Alanlar: Mevcut şifre, yeni şifre, tekrar.
+- Mevcut şifreyi doğrulamak için `supabase.auth.signInWithPassword({ email: user.email, password: current })` (oturumu bozmaz, sadece kimlik doğrular); başarılı olursa `updateUser({ password: new })`.
+- Toast ile geri bildirim; oturum korunur.
 
-### Faz 3 — Auth + `/admin` Kabuğu
-- Supabase Email/Password auth.
-- `/auth` public giriş sayfası.
-- `_authenticated/route.tsx` (managed gate, `ssr: false`).
-- `/_authenticated/admin` + `has_role(uid, 'admin')` ikinci kapı.
-- `noindex, nofollow` meta + `robots.txt`'te `Disallow: /admin`, `/auth`.
-- **Test:** Admin'e girişsiz erişilemez, admin olmayan kullanıcı reddedilir.
+**4. i18n**
+- `src/i18n/tr.ts` ve `en.ts`: `auth.forgot`, `auth.reset`, `admin.password` altında tüm etiketler, hata mesajları, toast metinleri.
 
-### Faz 4 — Admin Dashboard (6 sekme)
-Randevular / Hizmetler / Galeri / Çalışma Saatleri / Boş Zaman Dilimleri (toplu üretici) / Site İçeriği. Tüm yazma işlemleri `requireSupabaseAuth` + `has_role` kontrollü server fn.
+## Dosya Değişiklikleri
+- `src/routes/auth.tsx` — "Şifremi unuttum" akışı (aynı dosyada mod eklenerek).
+- `src/routes/reset-password.tsx` (yeni) — public, ssr:false, recovery oturumunu bekler.
+- `src/routes/_authenticated/admin.tsx` — şifre değiştirme paneli/dialog.
+- `src/i18n/tr.ts`, `src/i18n/en.ts` — yeni sözlük anahtarları.
+- `public/robots.txt` — `Disallow: /reset-password` satırı.
 
-### Faz 5 — Görsel Upload + Client-Side WebP
-- Supabase Storage `gallery` bucket.
-- Admin'de canvas → `toBlob('image/webp', 0.85)`; sadece WebP yüklenir. Safari fallback.
+## Teknik Notlar
+- Ek server fn veya migration gerekmez; her şey Supabase Auth client SDK üzerinden.
+- E-postalar Lovable'ın varsayılan şablonuyla gider — ek kurulum yok. İleride markalı e-posta istenirse `scaffold_auth_email_templates` ile eklenebilir.
+- `resetPasswordForEmail` çağrısı public'tir, hız limitine takılırsa `over_email_send_rate_limit` (429) görülebilir — nadiren olur, gerekirse `configure_auth` ile artırılır.
 
-### Faz 6 — Booking → DB + Sitemap
-- Booking formu boş slot'ları DB'den çeker; submit `appointments`'a INSERT + slot'u atomik olarak doldurur; WhatsApp yönlendirmesi korunur.
-- `src/routes/sitemap[.]xml.ts` (sadece public route'lar).
-- `robots.txt` güncellenir.
-
-## Riskler (özet)
-- RLS/GRANT eksikliği → 401: her tablo için checklist.
-- Service role sızıntısı: `client.server` sadece `.server.ts` + handler içinde `await import(...)`.
-- Slot çakışması: `UPDATE ... WHERE dolu=false RETURNING` idempotent yazım.
-- Config↔DB çift kaynak: Faz 2 sonunda config sadece `locale`, `seo`, WhatsApp numarası gibi build-time sabitleri tutar.
-
-Faz 1'e başlıyorum, biter bitmez durup test için bildireceğim.
+## Test
+1. `/auth` → "Şifremi unuttum" → mail gelir.
+2. Maildeki link `/reset-password`'a düşer, yeni şifre girilir, `/auth`'a yönlenir, yeni şifreyle giriş çalışır.
+3. Admin panelinde "Şifremi değiştir" ile mevcut şifre doğrulanıp yeni şifre kaydedilir, oturum korunur.
