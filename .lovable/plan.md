@@ -1,41 +1,39 @@
-## Amaç
-Admin kullanıcıları için şifre sıfırlama ve şifre değiştirme akışı eklemek. E-postalar Lovable'ın varsayılan gönderim altyapısı üzerinden gidecek (ek DNS/domain kurulumu yok).
+# Admin Kullanıcı Yönetimi
 
-## Akış Özeti
+Admin paneline yeni bir **"Kullanıcılar"** sekmesi eklenir. Silme, rol yönetimi ve yeni admin davet etme özelliklerini içerir.
 
-**1. /auth sayfasında "Şifremi unuttum"**
-- Giriş formunun altına link.
-- Tıklanınca aynı sayfada e-posta iste → `supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + "/reset-password" })`.
-- Toast: "Sıfırlama bağlantısı e-postanıza gönderildi."
+## Özellikler
 
-**2. Yeni public route: `/reset-password`**
-- SSR kapalı, `noindex, nofollow`.
-- Supabase, e-postadaki linkle geldiğinde `PASSWORD_RECOVERY` event'ini tetikler ve geçici oturum açar. Sayfa `onAuthStateChange` ile bu event'i dinler; geçerli recovery oturumu yoksa uyarı gösterir ("Bağlantı geçersiz veya süresi dolmuş").
-- İki alan: Yeni şifre + Tekrar. En az 6 karakter, eşleşme kontrolü.
-- Submit → `supabase.auth.updateUser({ password })` → başarı → `signOut()` + `/auth`'a yönlendirme + toast.
+**Liste:** Tüm kullanıcılar tabloda gösterilir — e-posta, kayıt tarihi, son giriş, rol rozeti (admin / kullanıcı).
 
-**3. Admin panelinde "Şifremi değiştir"**
-- `src/routes/_authenticated/admin.tsx` içinde, mevcut "Çıkış yap" butonunun yanına küçük bir bölüm/dialog.
-- Alanlar: Mevcut şifre, yeni şifre, tekrar.
-- Mevcut şifreyi doğrulamak için `supabase.auth.signInWithPassword({ email: user.email, password: current })` (oturumu bozmaz, sadece kimlik doğrular); başarılı olursa `updateUser({ password: new })`.
-- Toast ile geri bildirim; oturum korunur.
+**Rol yönetimi:** Her satırda "Admin yap" / "Admin rolünü kaldır" butonu. `user_roles` tablosuna insert/delete.
 
-**4. i18n**
-- `src/i18n/tr.ts` ve `en.ts`: `auth.forgot`, `auth.reset`, `admin.password` altında tüm etiketler, hata mesajları, toast metinleri.
+**Davet:** Üstte "Yeni admin davet et" butonu → e-posta girilir → Supabase Auth Admin API ile davet gönderilir (Lovable varsayılan e-postası) → kullanıcı kaydolduğunda otomatik admin rolü verilir.
 
-## Dosya Değişiklikleri
-- `src/routes/auth.tsx` — "Şifremi unuttum" akışı (aynı dosyada mod eklenerek).
-- `src/routes/reset-password.tsx` (yeni) — public, ssr:false, recovery oturumunu bekler.
-- `src/routes/_authenticated/admin.tsx` — şifre değiştirme paneli/dialog.
-- `src/i18n/tr.ts`, `src/i18n/en.ts` — yeni sözlük anahtarları.
-- `public/robots.txt` — `Disallow: /reset-password` satırı.
+**Silme:** Her satırda çöp kutusu ikonu → onay diyaloğu → kullanıcı `auth.users`'tan tamamen silinir (cascade ile `user_roles` da temizlenir).
 
-## Teknik Notlar
-- Ek server fn veya migration gerekmez; her şey Supabase Auth client SDK üzerinden.
-- E-postalar Lovable'ın varsayılan şablonuyla gider — ek kurulum yok. İleride markalı e-posta istenirse `scaffold_auth_email_templates` ile eklenebilir.
-- `resetPasswordForEmail` çağrısı public'tir, hız limitine takılırsa `over_email_send_rate_limit` (429) görülebilir — nadiren olur, gerekirse `configure_auth` ile artırılır.
+## Güvenlik Kuralları
+
+- Tüm işlemler `createServerFn` + `requireSupabaseAuth` + `has_role(admin)` kontrolünden geçer.
+- **Kendini silme engellenir:** server fn `context.userId === targetId` ise hata döner.
+- **Son admin koruması:** silinen/rolü alınan kullanıcı sistemdeki tek admin ise işlem reddedilir (admin kilitlenmesini önler).
+- Auth Admin API çağrıları için `supabaseAdmin` handler içinde `await import(...)` ile yüklenir (module scope'ta değil).
+
+## Teknik Detaylar
+
+**Yeni dosyalar:**
+- `src/lib/admin/users.functions.ts` — `adminListUsers`, `adminInviteAdmin`, `adminSetRole`, `adminDeleteUser` server fn'leri. Listeleme `supabaseAdmin.auth.admin.listUsers()` + `user_roles` join. Davet `supabaseAdmin.auth.admin.inviteUserByEmail(email, { data: { pending_role: 'admin' } })` + davet edilen e-postayı bir `pending_admin_invites` tablosuna kaydeder.
+- `src/components/admin/UsersTab.tsx` — tablo, davet dialog'u, rol butonları, silme onay diyaloğu (mevcut `AppointmentsTab` deseniyle aynı: React Query + `useServerFn` + `sonner` toast + `AlertDialog`).
+- Migration: `pending_admin_invites` tablosu (email, invited_by, created_at) + RLS (sadece admin okur/yazar) + `handle_new_user` trigger'ı: yeni kayıt olan kullanıcının e-postası `pending_admin_invites`'ta varsa otomatik `user_roles`'a admin ekle ve daveti sil.
+
+**Değişecek dosyalar:**
+- `src/routes/_authenticated/admin.tsx` — yeni "Kullanıcılar" sekmesi eklenir.
+- `src/i18n/tr.ts` ve `src/i18n/en.ts` — `admin.users` altında etiketler (title, subtitle, invite, delete, makeAdmin, removeAdmin, confirmDelete, kendini silme hatası, son admin hatası, vb.).
 
 ## Test
-1. `/auth` → "Şifremi unuttum" → mail gelir.
-2. Maildeki link `/reset-password`'a düşer, yeni şifre girilir, `/auth`'a yönlenir, yeni şifreyle giriş çalışır.
-3. Admin panelinde "Şifremi değiştir" ile mevcut şifre doğrulanıp yeni şifre kaydedilir, oturum korunur.
+
+1. Yeni bir e-postayı davet et → e-posta gelir → kaydol → otomatik admin olarak listelenir.
+2. Başka bir admine "Admin rolünü kaldır" → rozet "kullanıcı"ya döner.
+3. Kendi hesabını sil/rolünü kaldır → hata toast'ı görünür, işlem yapılmaz.
+4. Tek admin kalınca rol kaldırmayı dene → engellenir.
+5. Kullanıcıyı sil → auth'tan kaybolur, tekrar aynı e-postayla kaydolabilir.
