@@ -36,8 +36,8 @@ export function ChangePasswordDialog({ email }: Props) {
       toast.error("Kullanıcı bulunamadı");
       return;
     }
-    if (next.length < 6) {
-      toast.error("Yeni şifre en az 6 karakter olmalı");
+    if (!next) {
+      toast.error("Yeni şifre gerekli");
       return;
     }
     if (next !== confirm) {
