@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertAdmin } from "@/lib/admin/_authz";
 
 export type JsonValue =
   | string
@@ -18,22 +19,6 @@ export type SiteContentRow = {
   created_at: string;
   updated_at: string;
 };
-
-async function assertAdmin(context: {
-  supabase: {
-    rpc: (
-      fn: "has_role",
-      args: { _user_id: string; _role: "admin" | "editor" },
-    ) => PromiseLike<{ data: boolean | null }>;
-  };
-  userId: string;
-}) {
-  const { data: isAdmin } = await context.supabase.rpc("has_role", {
-    _user_id: context.userId,
-    _role: "admin",
-  });
-  if (!isAdmin) throw new Error("Forbidden");
-}
 
 const listSchema = z
   .object({ language: z.string().min(2).max(5).default("tr") })

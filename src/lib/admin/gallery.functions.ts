@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertAdmin } from "@/lib/admin/_authz";
 
 export type GalleryRow = {
   id: string;
@@ -12,22 +13,6 @@ export type GalleryRow = {
   created_at: string;
   updated_at: string;
 };
-
-async function assertAdmin(context: {
-  supabase: {
-    rpc: (
-      fn: "has_role",
-      args: { _user_id: string; _role: "admin" | "editor" },
-    ) => PromiseLike<{ data: boolean | null }>;
-  };
-  userId: string;
-}) {
-  const { data: isAdmin } = await context.supabase.rpc("has_role", {
-    _user_id: context.userId,
-    _role: "admin",
-  });
-  if (!isAdmin) throw new Error("Forbidden");
-}
 
 const upsertSchema = z.object({
   id: z.string().uuid().optional(),
