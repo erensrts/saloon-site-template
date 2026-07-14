@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertAdmin } from "@/lib/admin/_authz";
 
 export type ServiceRow = {
   id: string;
@@ -41,11 +42,7 @@ export const adminListServices = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => listSchema.parse(data ?? {}))
   .handler(async ({ data, context }): Promise<ServiceRow[]> => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
+    await assertAdmin(context);
 
     const { data: rows, error } = await context.supabase
       .from("services")
@@ -64,11 +61,7 @@ export const adminUpsertService = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => upsertSchema.parse(data))
   .handler(async ({ data, context }): Promise<ServiceRow> => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
+    await assertAdmin(context);
 
     if (data.id) {
       const { data: row, error } = await context.supabase
@@ -116,11 +109,7 @@ export const adminToggleService = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => toggleSchema.parse(data))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
+    await assertAdmin(context);
 
     const { error } = await context.supabase
       .from("services")
@@ -135,11 +124,7 @@ export const adminDeleteService = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => idSchema.parse(data))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
+    await assertAdmin(context);
 
     const { error } = await context.supabase
       .from("services")
