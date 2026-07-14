@@ -93,19 +93,10 @@ function AuthPage() {
 
         const { data: sess } = await supabase.auth.getSession();
         if (sess.session) {
-          try {
-            const res = await claimFirstAdmin();
-            if (res.claimed) {
-              toast.success("Hesap oluşturuldu — ilk admin olarak atandınız.");
-            } else {
-              toast.success("Hesap oluşturuldu. Bir admin size rol atayana kadar panel kısıtlı olacak.");
-            }
-          } catch {
-            toast.success("Hesap oluşturuldu.");
-          }
+          toast.success("Hesap oluşturuldu.");
           goToAdmin();
         } else {
-          toast.success("Doğrulama e-postası gönderildi. Onayladıktan sonra giriş yapın.");
+          toast.success("Hesap oluşturuldu. Şimdi giriş yapabilirsiniz.");
           setMode("signin");
         }
       } else {
