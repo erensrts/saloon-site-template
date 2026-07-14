@@ -103,7 +103,6 @@ export function ChangePasswordDialog({ email }: Props) {
             <input
               type="password"
               required
-              minLength={6}
               value={current}
               onChange={(e) => setCurrent(e.target.value)}
               autoComplete="current-password"
@@ -115,7 +114,6 @@ export function ChangePasswordDialog({ email }: Props) {
             <input
               type="password"
               required
-              minLength={6}
               value={next}
               onChange={(e) => setNext(e.target.value)}
               autoComplete="new-password"
@@ -127,7 +125,6 @@ export function ChangePasswordDialog({ email }: Props) {
             <input
               type="password"
               required
-              minLength={6}
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               autoComplete="new-password"
