@@ -105,7 +105,6 @@ function ResetPasswordPage() {
               <input
                 type="password"
                 required
-                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"
