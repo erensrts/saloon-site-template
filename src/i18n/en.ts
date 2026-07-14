@@ -103,7 +103,9 @@ export const en: Dictionary = {
       slots: "Availability Slots",
       gallery: "Gallery",
       content: "Site Content",
+      users: "Users",
     },
+
     common: {
       save: "Save",
       saving: "Saving…",
@@ -322,8 +324,48 @@ export const en: Dictionary = {
       },
       imagePreviewAlt: "Preview",
     },
+    users: {
+      title: "Users",
+      subtitle:
+        "Manage who can sign in to the admin panel. Invite new admins, change roles, or delete accounts.",
+      refresh: "Refresh",
+      invite: "Invite admin",
+      inviteTitle: "Invite a new admin",
+      inviteDesc:
+        "An invite link is sent to the email. When they sign up, they are automatically promoted to admin.",
+      emailLabel: "Email",
+      sendInvite: "Send invite",
+      you: "You",
+      pending: "Invite pending",
+      roleAdmin: "Admin",
+      roleUser: "User",
+      makeAdmin: "Make admin",
+      removeAdmin: "Remove admin",
+      columns: {
+        email: "Email",
+        role: "Role",
+        created: "Joined",
+        lastSignIn: "Last sign-in",
+        actions: "Actions",
+      },
+      confirmDelete: "Permanently delete this user?",
+      confirmCancelInvite: "Cancel this invite?",
+      toastInviteSent: "Invite sent",
+      toastInviteCancelled: "Invite cancelled",
+      toastPromoted: "User promoted to admin",
+      toastRoleUpdated: "Role updated",
+      toastDeleted: "User deleted",
+      errors: {
+        selfDelete: "You cannot delete your own account.",
+        selfRoleChange: "You cannot remove your own admin role.",
+        lastAdmin:
+          "This is the last admin — promote another user first.",
+        forbidden: "You do not have permission for this action.",
+      },
+    },
   },
 };
+
 
 
 
