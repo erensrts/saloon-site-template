@@ -20,18 +20,6 @@ export type SiteContentRow = {
   updated_at: string;
 };
 
-async function assertAdmin(context: {
-  supabase: {
-    rpc: (
-      fn: "has_role",
-      args: { _user_id: string; _role: "admin" | "editor" },
-    ) => PromiseLike<{ data: boolean | null }>;
-  };
-  userId: string;
-}) {
-  await assertAdmin(context);
-}
-
 const listSchema = z
   .object({ language: z.string().min(2).max(5).default("tr") })
   .default({ language: "tr" });

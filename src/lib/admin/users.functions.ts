@@ -21,18 +21,6 @@ export type PendingInviteRow = {
 
 export type AdminUserListItem = AdminUserRow | PendingInviteRow;
 
-async function assertAdmin(context: {
-  supabase: {
-    rpc: (
-      fn: "has_role",
-      args: { _user_id: string; _role: "admin" | "editor" },
-    ) => PromiseLike<{ data: boolean | null }>;
-  };
-  userId: string;
-}) {
-  await assertAdmin(context);
-}
-
 async function countAdmins(supabase: unknown): Promise<number> {
   const sb = supabase as {
     from: (t: string) => {

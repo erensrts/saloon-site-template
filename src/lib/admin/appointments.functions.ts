@@ -27,18 +27,6 @@ export type AppointmentRow = {
 
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
-async function assertAdmin(context: {
-  supabase: {
-    rpc: (
-      fn: "has_role",
-      args: { _user_id: string; _role: "admin" | "editor" },
-    ) => PromiseLike<{ data: boolean | null }>;
-  };
-  userId: string;
-}) {
-  await assertAdmin(context);
-}
-
 const listSchema = z.object({
   from: z.string().regex(dateRegex).optional(),
   to: z.string().regex(dateRegex).optional(),
