@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { claimFirstAdmin } from "@/lib/auth.functions";
+import { claimFirstAdmin, resolveLoginEmail } from "@/lib/auth.functions";
 import { Toaster } from "@/components/ui/sonner";
 
 const searchSchema = z.object({
@@ -30,11 +30,15 @@ export const Route = createFileRoute("/auth")({
 
 type Mode = "signin" | "signup" | "forgot";
 
+const USERNAME_RE = /^[A-Za-z0-9_.]{2,30}$/;
+
 function AuthPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const [mode, setMode] = useState<Mode>("signin");
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState(""); // signin: email or username
+  const [email, setEmail] = useState(""); // signup / forgot
+  const [username, setUsername] = useState(""); // signup only
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -49,17 +53,43 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const id = identifier.trim();
+        if (!id) throw new Error("E-posta veya kullanıcı adı gerekli");
+        let loginEmail = id;
+        if (!id.includes("@")) {
+          const { email: resolved } = await resolveLoginEmail({ data: { identifier: id } });
+          loginEmail = resolved;
+        }
+        const { error } = await supabase.auth.signInWithPassword({
+          email: loginEmail,
+          password,
+        });
         if (error) throw error;
         toast.success("Giriş başarılı");
         goToAdmin();
       } else if (mode === "signup") {
+        const uname = username.trim();
+        if (!USERNAME_RE.test(uname)) {
+          throw new Error(
+            "Kullanıcı adı 2-30 karakter arasında olmalı; yalnızca harf, rakam, alt çizgi ve nokta kullanın.",
+          );
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin + "/admin" },
+          options: {
+            emailRedirectTo: window.location.origin + "/admin",
+            data: { username: uname },
+          },
         });
-        if (error) throw error;
+        if (error) {
+          // profiles.username unique çakışması trigger üzerinden hata verir
+          const msg = error.message?.toLowerCase() ?? "";
+          if (msg.includes("profiles_username") || msg.includes("duplicate")) {
+            throw new Error("Bu kullanıcı adı zaten alınmış.");
+          }
+          throw error;
+        }
 
         const { data: sess } = await supabase.auth.getSession();
         if (sess.session) {
@@ -136,24 +166,58 @@ function AuthPage() {
         )}
 
         <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1.5">E-posta</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </div>
+          {mode === "signin" ? (
+            <div>
+              <label className="block text-sm font-medium mb-1.5">
+                E-posta veya Kullanıcı adı
+              </label>
+              <input
+                type="text"
+                required
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                autoComplete="username"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
+          ) : (
+            <>
+              {mode === "signup" && (
+                <div>
+                  <label className="block text-sm font-medium mb-1.5">Kullanıcı adı</label>
+                  <input
+                    type="text"
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    autoComplete="username"
+                    placeholder="ör. ayse.k"
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    2-30 karakter; harf, rakam, alt çizgi ve nokta.
+                  </p>
+                </div>
+              )}
+              <div>
+                <label className="block text-sm font-medium mb-1.5">E-posta</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </div>
+            </>
+          )}
           {mode !== "forgot" && (
             <div>
               <label className="block text-sm font-medium mb-1.5">Şifre</label>
               <input
                 type="password"
                 required
-                minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete={mode === "signin" ? "current-password" : "new-password"}
