@@ -3,30 +3,47 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /**
  * Şu anki kullanıcının admin rolü olup olmadığını döner.
- * RLS ve `has_role` üzerinden güvenli kontrol.
+ *
+ * `has_role` yardımcı fonksiyonu artık `private` şemasında olduğu için
+ * PostgREST üzerinden RPC ile çağrılamıyor; rolü doğrudan `user_roles`
+ * tablosundan okuyoruz (RLS izin veriyor: kullanıcı kendi rollerini görebilir).
  */
 export const getMyRole = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
+    const { data, error } = await context.supabase
+      .from("user_roles")
+      .select("id")
+      .eq("user_id", context.userId)
+      .eq("role", "admin")
+      .maybeSingle();
     if (error) throw error;
     return { userId: context.userId, isAdmin: Boolean(data) };
   });
 
 /**
  * Sistemde henüz admin yoksa çağıran kullanıcıyı admin yapar.
- * `claim_first_admin` fonksiyonu kendi içinde admin sayısını kontrol ettiği
- * için güvenli — mevcut admin varsa `false` döner ve hiçbir değişiklik olmaz.
+ *
+ * Admin sayısı kontrolü ve rol yazımı service-role istemcisi ile
+ * yapılır — böylece `claim_first_admin` fonksiyonunun API üzerinden
+ * çağrılabilir olmasına gerek kalmaz.
  */
 export const claimFirstAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.rpc("claim_first_admin", {
-      _user_id: context.userId,
-    });
-    if (error) throw error;
-    return { claimed: Boolean(data) };
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { count, error: countErr } = await supabaseAdmin
+      .from("user_roles")
+      .select("id", { count: "exact", head: true })
+      .eq("role", "admin");
+    if (countErr) throw countErr;
+    if ((count ?? 0) > 0) return { claimed: false };
+
+    const { error: insertErr } = await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: context.userId, role: "admin" });
+    if (insertErr) throw insertErr;
+    return { claimed: true };
   });
