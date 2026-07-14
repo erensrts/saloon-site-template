@@ -114,83 +114,84 @@ function AdminPage() {
       </header>
 
       <main className="container-narrow py-8 md:py-10">
-        <Tabs defaultValue="appointments" className="w-full">
-          <TabsList className="w-full flex-wrap h-auto justify-start gap-1 bg-card border border-border/60 p-1 rounded-2xl mb-6">
-            <TabsTrigger value="appointments" className="rounded-xl">
-              {ta.tabs.appointments}
-            </TabsTrigger>
-            <TabsTrigger value="services" className="rounded-xl">
-              {ta.tabs.services}
-            </TabsTrigger>
-            <TabsTrigger value="hours" className="rounded-xl">
-              {ta.tabs.hours}
-            </TabsTrigger>
-            <TabsTrigger value="slots" className="rounded-xl">
-              {ta.tabs.slots}
-            </TabsTrigger>
-            <TabsTrigger value="gallery" className="rounded-xl">
-              {ta.tabs.gallery}
-            </TabsTrigger>
-            <TabsTrigger value="content" className="rounded-xl">
-              {ta.tabs.content}
-            </TabsTrigger>
-            <TabsTrigger value="users" className="rounded-xl">
-              {ta.tabs.users}
-            </TabsTrigger>
+        {!isAdmin && (
+          <div className="mb-6 rounded-2xl border border-amber-300/60 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 text-sm text-amber-900 dark:text-amber-200 flex items-center gap-2">
+            <ShieldAlert size={16} />
+            <span>
+              Salt-okunur görüntüleme modu. Değişiklik yapabilmek için admin rolüne ihtiyacınız var.
+            </span>
+          </div>
+        )}
+        <fieldset
+          disabled={!isAdmin}
+          className={
+            !isAdmin
+              ? "min-w-0 [&_button:not([data-readonly-allow])]:pointer-events-none [&_a:not([data-readonly-allow])]:pointer-events-none [&_input]:pointer-events-none [&_textarea]:pointer-events-none [&_select]:pointer-events-none opacity-95"
+              : "min-w-0"
+          }
+        >
+          <Tabs defaultValue="appointments" className="w-full">
+            <TabsList className="w-full flex-wrap h-auto justify-start gap-1 bg-card border border-border/60 p-1 rounded-2xl mb-6">
+              <TabsTrigger value="appointments" data-readonly-allow className="rounded-xl">
+                {ta.tabs.appointments}
+              </TabsTrigger>
+              <TabsTrigger value="services" data-readonly-allow className="rounded-xl">
+                {ta.tabs.services}
+              </TabsTrigger>
+              <TabsTrigger value="hours" data-readonly-allow className="rounded-xl">
+                {ta.tabs.hours}
+              </TabsTrigger>
+              <TabsTrigger value="slots" data-readonly-allow className="rounded-xl">
+                {ta.tabs.slots}
+              </TabsTrigger>
+              <TabsTrigger value="gallery" data-readonly-allow className="rounded-xl">
+                {ta.tabs.gallery}
+              </TabsTrigger>
+              <TabsTrigger value="content" data-readonly-allow className="rounded-xl">
+                {ta.tabs.content}
+              </TabsTrigger>
+              <TabsTrigger value="users" data-readonly-allow className="rounded-xl">
+                {ta.tabs.users}
+              </TabsTrigger>
+              {placeholderTabs.map((tab) => (
+                <TabsTrigger key={tab.value} value={tab.value} data-readonly-allow className="rounded-xl">
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
 
+            <TabsContent value="appointments" className="mt-0">
+              <AppointmentsTab />
+            </TabsContent>
+            <TabsContent value="services" className="mt-0">
+              <ServicesTab />
+            </TabsContent>
+            <TabsContent value="hours" className="mt-0">
+              <WorkingHoursTab />
+            </TabsContent>
+            <TabsContent value="slots" className="mt-0">
+              <SlotsTab />
+            </TabsContent>
+            <TabsContent value="gallery" className="mt-0">
+              <GalleryTab />
+            </TabsContent>
+            <TabsContent value="content" className="mt-0">
+              <ContentTab />
+            </TabsContent>
+            <TabsContent value="users" className="mt-0">
+              <UsersTab />
+            </TabsContent>
 
             {placeholderTabs.map((tab) => (
-              <TabsTrigger key={tab.value} value={tab.value} className="rounded-xl">
-                {tab.label}
-              </TabsTrigger>
+              <TabsContent key={tab.value} value={tab.value} className="mt-0">
+                <div className="rounded-2xl bg-card border border-dashed border-border/70 p-10 text-center text-muted-foreground">
+                  <p className="font-display text-xl mb-1">{tab.label}</p>
+                  <p className="text-sm">{ta.common.soon}</p>
+                </div>
+              </TabsContent>
             ))}
-
-          </TabsList>
-
-          <TabsContent value="appointments" className="mt-0">
-            <AppointmentsTab />
-          </TabsContent>
-
-          <TabsContent value="services" className="mt-0">
-            <ServicesTab />
-          </TabsContent>
-
-
-          <TabsContent value="hours" className="mt-0">
-            <WorkingHoursTab />
-          </TabsContent>
-
-          <TabsContent value="slots" className="mt-0">
-            <SlotsTab />
-          </TabsContent>
-
-          <TabsContent value="gallery" className="mt-0">
-            <GalleryTab />
-          </TabsContent>
-
-          <TabsContent value="content" className="mt-0">
-            <ContentTab />
-          </TabsContent>
-
-          <TabsContent value="users" className="mt-0">
-            <UsersTab />
-          </TabsContent>
-
-
-
-
-
-
-
-          {placeholderTabs.map((tab) => (
-            <TabsContent key={tab.value} value={tab.value} className="mt-0">
-              <div className="rounded-2xl bg-card border border-dashed border-border/70 p-10 text-center text-muted-foreground">
-                <p className="font-display text-xl mb-1">{tab.label}</p>
-                <p className="text-sm">{ta.common.soon}</p>
-              </div>
-            </TabsContent>
-          ))}
-        </Tabs>
+          </Tabs>
+        </fieldset>
       </main>
       <Toaster position="top-center" richColors />
     </div>
