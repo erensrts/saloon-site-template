@@ -2,6 +2,36 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /**
+ * Girişte kullanılan kimliği (kullanıcı adı veya e-posta) e-postaya çevirir.
+ * Girdi `@` içeriyorsa aynen döner; aksi halde `profiles` tablosundan kullanıcı
+ * kimliğini bulup Auth Admin API ile e-postayı okur. Bulunamazsa hata fırlatır.
+ */
+export const resolveLoginEmail = createServerFn({ method: "POST" })
+  .inputValidator((input: { identifier: string }) => {
+    const identifier = String(input?.identifier ?? "").trim();
+    if (!identifier) throw new Error("Kimlik gerekli");
+    return { identifier };
+  })
+  .handler(async ({ data }) => {
+    if (data.identifier.includes("@")) return { email: data.identifier };
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data: profile, error } = await supabaseAdmin
+      .from("profiles")
+      .select("id")
+      .eq("username", data.identifier)
+      .maybeSingle();
+    if (error) throw error;
+    if (!profile) throw new Error("Kullanıcı adı bulunamadı");
+    const { data: userRes, error: uerr } = await supabaseAdmin.auth.admin.getUserById(profile.id);
+    if (uerr) throw uerr;
+    const email = userRes?.user?.email ?? null;
+    if (!email) throw new Error("Kullanıcı adı bulunamadı");
+    return { email };
+  });
+
+/**
  * Şu anki kullanıcının admin rolü olup olmadığını döner.
  *
  * `has_role` yardımcı fonksiyonu artık `private` şemasında olduğu için
