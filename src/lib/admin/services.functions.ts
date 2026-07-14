@@ -41,10 +41,11 @@ const listSchema = z
 export const adminListServices = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => listSchema.parse(data ?? {}))
-  .handler(async ({ data, context }): Promise<ServiceRow[]> => {
-    await assertAdmin(context);
-
-    const { data: rows, error } = await context.supabase
+  .handler(async ({ data }): Promise<ServiceRow[]> => {
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data: rows, error } = await supabaseAdmin
       .from("services")
       .select(
         "id,language,icon,name,description,price,sort_order,is_active,created_at,updated_at",

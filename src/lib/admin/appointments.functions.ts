@@ -37,9 +37,11 @@ const listSchema = z.object({
 export const adminListAppointments = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => listSchema.parse(data ?? {}))
-  .handler(async ({ data, context }): Promise<AppointmentRow[]> => {
-    await assertAdmin(context);
-    let q = context.supabase
+  .handler(async ({ data }): Promise<AppointmentRow[]> => {
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    let q = supabaseAdmin
       .from("appointments")
       .select(
         "id,name,phone,email,service,date,time,note,status,created_at,updated_at",

@@ -51,9 +51,11 @@ const COLS = "id,language,key,value,created_at,updated_at";
 export const adminListSiteContent = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => listSchema.parse(data ?? {}))
-  .handler(async ({ data, context }): Promise<SiteContentRow[]> => {
-    await assertAdmin(context);
-    const { data: rows, error } = await context.supabase
+  .handler(async ({ data }): Promise<SiteContentRow[]> => {
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data: rows, error } = await supabaseAdmin
       .from("site_content")
       .select(COLS)
       .eq("language", data.language)

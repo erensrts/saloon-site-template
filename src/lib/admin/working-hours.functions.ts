@@ -29,9 +29,11 @@ const listSchema = z
 export const adminListWorkingHours = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => listSchema.parse(data ?? {}))
-  .handler(async ({ data, context }): Promise<WorkingHourRow[]> => {
-    await assertAdmin(context);
-    const { data: rows, error } = await context.supabase
+  .handler(async ({ data }): Promise<WorkingHourRow[]> => {
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data: rows, error } = await supabaseAdmin
       .from("working_hours")
       .select("id,language,day_label,time_label,sort_order,created_at,updated_at")
       .eq("language", data.language)
